@@ -1,0 +1,44 @@
+﻿<script src="head.js"></script>
+<script src="JS/jquery-1.9.1.js"></script>
+<script src="JS/jquery.qrcode.min.js"></script>
+<script type="text/javascript" src="JS/public.js"></script>
+
+<div style="font-size:20px; padding:5% 20% 20% 30%; width:100%;height:100%; background-color:white;">
+<script>
+	var PUB_cfg=getConfig();
+	//读取cookies
+	function getCookie(name)
+	{
+		var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)"); 
+		if(arr=document.cookie.match(reg))
+			return (arr[2]);
+		else
+			return null;
+	}
+	var userName=getCookie("cnsShopUserName");
+	var shopId=getCookie("cnsShopShopId");
+	var url=PUB_cfg.srvURL + ":3000?shopId=" + shopId;
+	document.write('<p>当前用户: ' + userName + '</p>');
+	document.write('<p>本店店铺ID: ' + shopId + '</p>');
+	document.write('<p>本店地址: ' + PUB_cfg.srvURL + ':3000?shopId=' + shopId + '</p>');
+	
+	document.write('<p>本店二维码：</p>');
+	document.write('<div id="output"></div>');
+	
+	var code={
+	text     : url,
+	render   : "canvas",//设置渲染方式  
+	width       : 256,     //设置宽度  
+	height      : 256,     //设置高度  
+	typeNumber  : -1,      //计算模式  
+//	correctLevel    : QRErrorCorrectLevel.H,//纠错等级  
+	background      : "#ffffff",//背景颜色  
+	foreground      : "#000000" //前景颜色  
+	}
+	jQuery('#output').qrcode(code);  
+</script>
+
+</div>
+
+<script src="tail.js"></script>
+

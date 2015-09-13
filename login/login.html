@@ -1,0 +1,74 @@
+<!DOCTYPE HTML >
+<HTML>
+<head>
+<META content="IE=10.000" http-equiv="X-UA-Compatible">
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+<TITLE>Feter餐饮CRM登录页面 </TITLE>  
+<script type="text/javascript" src="../bin/JS/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="../bin/JS/public.js"></script>
+<LINK href="css/reset.css" rel="stylesheet" type="text/css">  
+<LINK href="css/signin.css" rel="stylesheet" type="text/css">
+
+</head> 
+<BODY>
+
+<div class="signin-bg"></div>
+
+<div class="signin-container">
+
+	<div style="margin: 170px 0px 30px 45px;">
+		<div style="width: 340px; float: left; display: inline-block;">
+			<div style="margin-bottom:8px;"><p class="title">欢迎使用Fster餐饮CRM</p></div>
+			<FORM name="loginform" id="loginform" action="" method="post">
+				 
+				<div style="margin-top: 25px;"><INPUT name="username" class="signin-txt" id="username" type="text" placeholder="用户名" value=""></div>
+				<div style="margin-top: 20px;"><INPUT name="password" class="signin-txt" id="password" type="password" placeholder="密码" value=""></div>
+				<div style="margin-top: 20px;">
+					<SPAN class="button default signin-btn" id="signin_btn" onClick="loginIn()">立即登录</SPAN>	
+					<A class="signin-forget" href="">忘记密码</A>
+				</div>
+				<div style="color: rgb(34, 34, 34); margin-top:38px;">还没有账户？您可以在此&nbsp;<A style="color: rgb(228, 87, 61);" href="signin.html">注册</A></div>
+			</FORM>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+</div>
+<script language="javascript">
+	var PUB_cfg=getConfig();
+	function setCookie(name,value)
+	{
+		var Days = 30;
+		var exp = new Date();
+		exp.setTime(exp.getTime() + Days*24*60*60*1000);
+		document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString()+";path=/";  
+	}
+	function loginIn(){
+		var type=2;
+		var userName=$$("username").value;
+		var passwd=$$("password").value;
+		ajaxData(PUB_cfg.ajaxURL +'/login',{userName:userName,passwd:passwd},"",function(data){
+			if(data.error==undefined){
+				if(type!=3){
+					if(data.shop==undefined)
+						alert("未查询到您所关联的商家！");
+					else{
+						setCookie("cnsShopUserName",userName);
+						setCookie("cnsShopShopId",data.shop);
+						window.location.href="../bin/twoCode.html";
+					}
+				}
+			}else{
+				alert("用户名或密码错误！");	
+			}
+//			btnCtl(1);
+		},function(){
+			alert("系统繁忙！,请稍后再试");
+//			btnCtl(1);
+		});
+	}
+
+</script>
+
+</BODY>
+</HTML>

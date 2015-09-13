@@ -1,0 +1,43 @@
+@charset "utf-8";
+/* CSS Document */
+
+.halfW{ width:50%; min-width:20px}
+.halfH{ height:50%}
+.allW{ width:100%}
+.floatL{ float:left}
+.floatR{ float:right}
+.clear{ overflow:hidden;zoom:1}
+.center{ text-align:center}
+._btn{ width:50px;margin-top:1px; height:25px}
+.right{ text-align:right }
+.left{ text-align:left }
+.pointer{ cursor:pointer}
+.w3{ width:30% }
+.w4{ width:40% }
+.w5{ width:50% }
+.w6{ width:60% }
+.w7{ width:70% }
+.w9{ width:90% }
+
+.w25{ width:25%}
+.w28{ width:28%}
+.red{ color:red}
+
+.bdnb{ border:0px; height:25px }
+.pdTop{ padding-top:9px; padding-left:10px}
+.pdLeft{ padding-left:0px}
+.hide{ display:none; }
+
+
+.lines-both .datagrid-body td{
+}
+.lines-no .datagrid-body td{
+	border-right:1px dotted transparent;
+	border-bottom:1px dotted transparent;
+}
+.lines-right .datagrid-body td{
+	border-bottom:1px dotted transparent;
+}
+.lines-bottom .datagrid-body td{
+	border-right:1px dotted transparent;
+}

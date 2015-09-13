@@ -1,0 +1,195 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="JS/ejs/ejs.js"></script>
+<script type="text/javascript" src="JS/json2.js"></script>
+<script type="text/javascript" src="JS/public.js"></script>
+<link rel="stylesheet" href="Css/public.css" type="text/css" />
+<script  type="text/javascript" src="head.js"></script>
+
+<style type="text/css">
+#desk_sel{color:#F03; font-weight:100}
+#dv_desk{ width:100%; }
+#dv_mark{ width:100%; overflow:hidden;zoom:1}
+.rect{ border:thin 1px ;
+	margin:2px; min-width:20px; background-color:#CFF;width:40px;height:25px; text-align:center; cursor:pointer;
+	}
+.c_btn{ width:80px;margin-top:20px; height:25px;border:#066 1px solid; line-height:25px; }
+.pdTop{ padding-top:5px; padding-left:2px}
+</style>
+
+
+<div style="padding:20px 5% 20px 5%; width:90%; font-size:16px " >
+    <div class="allW" style="margin-bottom:20px">
+        <div class="halfW floatL center"><label>请选择桌号：</label></div>
+        <div class="halfW floatR center"><label id="desk_sel">数据加载中...</label></div>   
+    </div>
+    <div id="dv_desk">&nbsp;
+    
+    </div>
+    
+    <div id="dv_mark">
+        <div>注： </div>
+        <div class="clear"><div id="dv_color_free" class="rect floatL"></div><div class="floatL pdTop"> 空闲中</div></div>
+        <div class="clear"><div id="dv_color_now" class="rect floatL"></div><div class="floatL pdTop"> 待请求</div></div>
+        <div class="clear"><div id="dv_color_unused" class="rect floatL"></div><div class="floatL pdTop"> 已请求</div></div>
+        <div class="clear"><div id="dv_color_used" class="rect floatL"></div><div class="floatL pdTop"> 使用中</div></div>
+    </div>
+</div>
+
+<p id="cacheData" style="display:none"></p>
+<p id="cache_desk" style="display:none"></p>
+<p id="cache_desk_now" style="display:none;"></p>
+<p id="cache_ready" style="display:none;">0</p>
+
+<script id="tm_desk" type="text/template">
+	<% var index=1;%>
+	<div class="allW">
+	<% for(var i=0;i<desk.rowCount;i++){ %>
+		<% for(var j=0;j<desk.colCount;j++){ %>
+			<div class="rect floatL" id="desk<%= index %>" 
+			onclick="javascript:ckDesk('desk<%= index %>')" 
+			onmousemove="javascript:changeColor('desk<%= index %>')"
+			onMouseout="javascript:revertColor('desk<%= index %>')"
+			><%= index %></div>
+			<% index++; %>
+			<%   if(index==desk.maxDesk+1)break; %>
+		<% } %>			
+	<% } %>
+	</div>
+	<div style="overflow:hidden;zoom:1;text-align:center;" class="allW">
+	<input type="button" class="c_btn btn-default btnb" value="请求" onclick="javascript:subDesk()" >
+	</div>
+</script>
+
+<script>
+	var PUB_cfg=getConfig();
+	var PUB_user=getUser();
+	function $$(id){ return document.getElementById(id); };
+	onload = function(){
+
+	var count=100;
+	var colCount=parseInt($$("dv_desk").offsetWidth/13);
+	var rowCount=Math.ceil(count/colCount);
+	var dt={perCount:10};  
+	var data={title:'Hello moto',desk:{
+		perWidth:10,maxDesk:100,colCount:colCount,rowCount:rowCount}
+	};
+	var tm_desk = document.getElementById('tm_desk').innerHTML;  
+	var html = ejs.render(tm_desk, data);	
+    dv_desk.innerHTML = html;  //End EJS
+	var cfg={desk:{color:"#CFF",selColor:"#0C9",mouseColor:"#6CC",nowColor:"#F66",usedColor:"#C00"}};
+	cacheData.innerHTML=JSON.stringify(cfg);
+	$$("dv_color_free").style.backgroundColor=cfg.desk.color;		
+	$$("dv_color_now").style.backgroundColor=cfg.desk.nowColor;		
+	$$("dv_color_used").style.backgroundColor=cfg.desk.usedColor;
+	$$("dv_color_unused").style.backgroundColor=cfg.desk.selColor;
+	
+	//**************************请求数据
+	$.ajax({
+		url: PUB_cfg.ajaxURL + '/keyNow', //cins.swpu.edu.cn
+		dataType: "jsonp",	 
+		data: {shopId:PUB_user.shop},    //附加数据请用json表示
+		type: 'get',
+		jsonpCallback: 'callback', 
+		success: function (data) {
+			var dsk={};//记录已有桌子
+			if(data.error==undefined){
+				for(var i=0;i<data.length;i++){
+					var id=data[i].tid;
+					var state=data[i].ostate;
+					dsk[id]={code:data[i].okey,state:state};
+					var color=(state==1)?cfg.desk.selColor:cfg.desk.usedColor;
+					$$("desk" + id).style.backgroundColor=color;										
+				}
+				desk_sel.innerHTML="共" + data.length + "桌";
+				cache_ready.innerHTML="1";
+			}		
+			cache_desk.innerHTML=JSON.stringify(dsk);
+		},
+		error: function (xhr, status, error) {
+			desk_sel.innerHTML="连接服务器失败!";
+			//$$('#rst').html(error.toString());
+		},
+	});	
+	//**************************End·请求数据	
+    }  //End OnLoad
+
+	function ckDesk(id){
+		var Enabled=parseInt(cache_ready.innerHTML);
+		if(Enabled=="0"){ desk_sel.innerHTML="请稍候重试！"; return; }
+		var data=unUsed(id);
+		var oldID=cache_desk_now.innerHTML;
+		if(data.isData){//使用中，不可取消
+			desk_sel.innerHTML=data.dsk[data.num].code + " (" + data.num + "号桌)";
+			cache_desk_now.innerHTML="";
+			$$(oldID).style.backgroundColor=data.cfg.desk.color;//旧的
+			return;		
+		} 
+		if(oldID==id){
+			$$(oldID).style.backgroundColor=data.cfg.desk.color;//旧的
+			cache_desk_now.innerHTML="";
+			desk_sel.innerHTML="已取消";
+		}else{
+			if(oldID!="")$$(oldID).style.backgroundColor=data.cfg.desk.color;//旧的
+			cache_desk_now.innerHTML=id;			
+			$$(id).style.backgroundColor=data.cfg.desk.nowColor;
+			desk_sel.innerHTML="已选择 " + data.num;
+		}
+	}
+	function changeColor(id){
+		var data=unUsed(id);
+		if(data.rst)$$(id).style.backgroundColor=data.cfg.desk.mouseColor;
+	}
+	function revertColor(id){
+		var data=unUsed(id);
+		if(data.rst)$$(id).style.backgroundColor=data.cfg.desk.color;
+	}
+	//判断当前id
+	function unUsed(id){
+		var cfg=JSON.parse(cacheData.innerHTML);
+		var txt=cache_desk.innerHTML;
+		var dsk=(txt=="")?{}:JSON.parse(txt);
+		var num=parseInt(id.substr(4));  //取数字
+		var idNow=cache_desk_now.innerHTML; //当前点击但未确定
+		var data={cfg:cfg,isData:undefined!=dsk[num],isNow:id==idNow,
+			rst:undefined==dsk[num] && id!=idNow,num:num,dsk:dsk
+		};
+		return data;
+	}
+	//请求验证码
+	function subDesk(){
+		var id=cache_desk_now.innerHTML;
+		if(id.length<4){ desk_sel.innerHTML="桌号错误"; return;}
+		var did=parseInt(id.substr(4));  //取数字
+		if(id=="")desk_sel.innerHTML="请选择后再提交";
+		else{
+			desk_sel.innerHTML="请等待...";
+			$.ajax({
+			url: PUB_cfg.ajaxURL + '/key', //cins.swpu.edu.cn
+			dataType: "jsonp",	 
+			data: {did: did, shopId:PUB_user.shop},    //附加数据请用json表示
+			type: 'get',
+			jsonpCallback: 'callback', 
+			success: function (data) {
+				if(data.error==undefined){
+					desk_sel.innerHTML="验证码：" + data.code + 
+				"   (" + data.did + "号桌)";
+					var dsk=JSON.parse(cache_desk.innerHTML);
+					dsk[did]={code:data.code,state:1};
+					cache_desk.innerHTML=JSON.stringify(dsk);
+					var cfg=JSON.parse(cacheData.innerHTML);
+					$$(id).style.backgroundColor=cfg.desk.selColor;
+					cache_desk_now.innerHTML="";
+				}
+				else
+					desk_sel.innerHTML="请求失败";					
+			},
+			error: function (xhr, status, error) {
+				desk_sel.innerHTML="连接服务器失败!";
+				  //$$('#rst').html(error.toString());
+			},
+	   		});	
+		}
+	}
+	
+</script>
+<script  type="text/javascript" src="tail.js"></script>

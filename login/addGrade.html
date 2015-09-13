@@ -1,0 +1,40 @@
+﻿
+<link rel="stylesheet" type="text/css" href="../bin/css/easyui.css">
+<script type="text/javascript" src="../bin/JS/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="../bin/JS/jquery.easyui.min.js"></script> 
+
+<style type="text/css">
+.txt1{ height:35px; width:220px; }
+.btn1{ height:35px;}
+#selGroup{ width:300px; margin-left:10px; height:170px}
+#selGrade{ width:300px; margin-left:10px;height:255px}
+
+</style>
+
+<div style=" margin:15px 10px 0px 30px">
+<label id="lb_rst" class="red"></label>
+<!--添加派系-->
+<div class="mgtop">
+<div id="p" class="easyui-panel" title="添加派系"     
+        style="min-width:800px;height:260px;padding:10px;background:#fafafa;"   
+        data-options="iconCls:'icon-sum',closable:true,    
+                collapsible:true,minimizable:true,maximizable:true" align="center">   
+    <div class="w55 floatL">
+	    <div style="padding-top:30px">
+        	<span class="floatL">派系名称：<input type="varchar" id="groupName" placeholder="派系名称" class="txt1" /></span>
+    		<span class="floatL"><button type="button" class="btn-default btn1" onclick="javascripts:addGroup();">提交</button></span>
+        </div>
+    </div>
+    <div class="w45 floatL mgtop center">
+    	<select size="11" id="selGroup" class="floatL" ><option value="-2">无派系信息</option></select>
+    </div>
+</div> 
+</div>
+
+
+
+</div>
+
+
+
+

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  href="css/login.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="js/city.js"  ></script>
+
+
+<script type="text/javascript" src="../bin/JS/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="../bin/JS/public.js"></script>
+<script type="text/javascript" src="../bin/JS/ejs/ejs.js"  ></script>
+<script type="text/javascript" src="../bin/JS/jquery.easyui.min.js"></script> 
+<link rel="stylesheet" type="text/css" href="../bin/css/easyui.css">
+
+
+<style type="text/css">
+.fmL{ float:left; width:30%; text-align:right; margin-top:17px; margin-right:3%; }
+.fmR{ float:left; width:67%; text-align:left; margin-top:15px; }
+.lbInfo{ color:#999; font-size:11px; }
+.lbError{ color:red; font-size:11px; font:}
+.pdLeft{ padding-left:0px}
+.clear{ overflow:hidden;zoom:1}
+.clear{  clear:both }
+.allW{ width:100% }
+.red{ color:red }
+.w6{ width:60% }
+.w4{ width:40% }
+input{ height:30px; line-height:30px; width:250px;}
+label{ font-size:15px }
+textarea{ width:250px; height:80px;}
+select{ width:124px; height:30px}
+.btnReg {
+    width: 119px;    height: 37px;    font-size: 14px;    background-position: 0 -360px;
+    text-decoration: none;    line-height: 37px;	border:0px solid #093;cursor:pointer;
+	background-color:#218868;    color: #FFF;    outline: none;    text-align: center;    font-weight: bold;
+}
+.panel-header{ padding:0px; }
+.panel-tool{ display:none}
+.p_title div{ padding-left:20px; height:40px; line-height:40px; font-family:STSong; font-size:16px; color:white;border:0px; font-weight:lighter; background-color:#4682B4  
+}
+.code{background-image:url(img/code1.png);   font-family:Arial; font-style:italic; height:35px; margin-left:5px; padding-right:10px;
+  color:Red;font-weight:bolder;text-align:center; width:80px;letter-spacing:7px; font-size:18px; line-height:33px
+}
+.txtCode{ width:80px; font-size:16px }
+
+.myBtn1{height:40px; padding-top:2px; text-align:left;width:120px; border:0px}
+.myBtn2{height:40px; padding-top:2px; text-align:center; margin-left:-30px;border:0px}
+.myBtn3{height:40px; padding-top:2px; text-align:right; margin-left:-30px;border:0px}
+</style>
+</head>
+<body style="margin:0px; padding:0px; height:auto;">
+<!--head-->
+<div style=" width:80%;margin-top:15px; min-height:10px;overflow:hidden;zoom:1;" id="dv_head">
+    <div style="float:left; width:20%; height:60px; margin-right:10px">
+    	<img style="width:100%; height:100%" src="img/logoCINS2.1.png">
+    </div>
+    <div style="float:left; width:60%; padding-top:10px;color:#747577; font-size:24px; font-weight:bold;font-family:YouYuan">
+        Fster：先进智能的餐饮管理平台
+    </div>
+</div>
+<!-- End head-->
+<!--main-->
+<div style="height:auto; width:100%; margin-top:10px; margin-bottom:0px" align="center">
+    <div id="p" class="easyui-panel" title="欢迎注册Fster店方管理账户！注册后可以成为商家会员，享受优质服务。" style="width:1000px; height:640px;background:white; font-size:16px; border:1px solid #ccc" data-options="headerCls:'p_title',tools:''" align="center">   
+        <div style=" width:70%;margin-left:0;font-size:18px;float:left;">
+        	<div style=" width:100%; margin:25px 0px 10px 0px;overflow:hidden;zoom:1;" align="center">
+            	<div class="myBtnGroup">
+               		<div id="myBtn1" class="my_btn_active">注册商家用户</div>
+                   	<div id="myBtn2" class="my_btn">注册服务人员</div>
+                   	<div id="myBtn3" class="my_btn">注册顾客会员</div>
+               	</div>
+            </div>
+            <div id="mylogin"></div>
+        </div>
+        <div style=" width:30%; height:100%;background-color:#E0E0E0;float:left;"> </div>
+    </div> 
+</div> 
+<!--End main-->
+
+<div style="display:none">
+    <!--组件-->
+    <div id="addrSel">
+        <select  name="ddlProvince" id="ddlProvince" onchange="selectMoreCity(this)"></select>
+        <select name="ddlCity" id="ddlCity" onChange="javascripts:setInfo(6,'',0);"><option selected value="">城市</option></select> 
+    </div>
+    <!--End·组件-->
+</div>
+<!--组件·验证码-->
+<script id="tm_code" type="text/template">
+    <div id="myCode">
+        <div>
+            <div style="float:left;"><input type="text" class="txtCode" id="<%= txtID %>" onBlur="javascripts:<%= func %>(this.id,this.value);" /></div>
+            <div style="float:left;" class="code" id="checkCode" onclick="createCode('checkCode')"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</script>
+<!--End·组件-->
+<!--主框架-->
+<script id="tm_signin" type="text/template">
+	<% 
+	var ids=["","","","",""];
+	var txt=["Topic","L1","Main","Error","Info"]; 
+	for(var i=0;i<topic.length;i++){
+		for(var j=0;j<5;j++)ids[j]="L" + (i+1).toString() + txt[j]; 
+		var index=0; %>
+		<div class="clear">
+			<div class="fmL">
+				<div><label class="red">* </label><label id="<%= ids[index++] %>"><%= topic[i] %></label></div>
+				<div><label id="<%= ids[index++] %>"></label></div>
+			</div>
+			<div class="fmR">
+				<div class="allW" id="<%= ids[index++] %>"></div>
+				<div class="clear pdLeft"><label class="lbError" id="<%= ids[index++] %>"></label></div>
+				<div class="clear pdLeft"><label class="lbInfo" id="<%= ids[index++] %>"></label></div>        
+			</div>
+		</div>
+	<% } %>
+<div class="w6" style=" margin-left:12%;clear:both;text-align:center; margin:20px 0px 15px 0px">
+	<input type="button" class="btnReg" id="btnReg" value="立即注册" onclick="javascript:subSignIN(<%= type %>)" >
+</div>
+</script>
+<!--End·主框架-->
+
+<script language="javascript">
+	var PUB_cfg=getConfig();
+	function $$(id){ return document.getElementById(id); };
+	function setHead(){ $$("dv_head").style.marginLeft=$$("p").offsetLeft + 'px'; }
+	window.onresize = function (){ setHead(); }
+	var cache_code="";
+	var cache_addr_html="";
+	//导航条
+	var cache_error={};
+	$(function(){
+		setHead();
+		cache_addr_html=$$("addrSel").innerHTML;
+		$$("addrSel").innerHTML="";
+		loadSignin1();//panel1
+		var all_div=$('.myBtnGroup div');
+		var div=all_div[0];
+		all_div.click(function(){
+			div.className='my_btn';
+			this.className='my_btn_active';
+			div=this;
+			if(this.id=="myBtn1")loadSignin1();
+			else if(this.id=="myBtn2")loadSignin2();
+			else if(this.id=="myBtn3")loadSignin3();
+		});
+	});
+	function getHtmlByID(tm_id,data){
+		var tm_s = document.getElementById(tm_id).innerHTML;  
+		var html = ejs.render(tm_s, data);			
+		return html;
+	}
+	//*************************************layout*****************************
+	//通用部分
+	function loadPublic(data){
+		cache_error={};
+		mylogin.innerHTML=getHtmlByID('tm_signin',data);
+		var T=' onBlur="javascripts:checkValue(this.id,this.value);"';
+		$$("L1Main").innerHTML='<input type="text" id="txt1" placeholder="请输入用户名"'+ T +' />';
+		$$("L2Main").innerHTML='<input type="text" id="txt2" placeholder="请输入密码"'+ T +' />';
+		$$("L3Main").innerHTML='<input type="text" id="txt3" placeholder="再次输入密码"'+ T +' />';
+		return T;
+	}
+	//注册·商家
+	function loadSignin1(){
+		var data={type:1,
+			topic:["用户名","密码","确认密码","店铺名","手机号码","店铺地址","详细地址","验证码" ]
+		};
+		var T=loadPublic(data);
+		$$("L4Main").innerHTML='<input type="text" id="txt4" placeholder="请输入店铺名"'+ T +' />';
+		$$("L5Main").innerHTML='<input type="text" id="txt5" placeholder="请输入联系方式" onkeyup="this.value=keepNum(this.value)"  onafterpaste="this.value=keepNum(this.value)"'+ T +' />';
+		$$("L7Main").innerHTML='<textarea id="txt7"'+ T +'></textarea>';
+		$$("L6Main").innerHTML=cache_addr_html;
+		$$("L8Main").innerHTML=getHtmlByID('tm_code',{txtID:"txt8",func:"checkValue" });
+		cache_code=createCode('checkCode');
+		for(var i=1;i<9;i++)cache_error["txt" + i.toString()]=false;	
+	}
+	//注册·服务人员
+	function loadSignin2(){
+		var data={type:2, topic:["用户名","密码","确认密码","店铺ID","验证码" ] };
+		var T=loadPublic(data);
+		$$("L4Main").innerHTML='<input type="text" id="txt4" placeholder="请输入店铺ID"'+ T +' />';		
+		$$("L5Main").innerHTML=getHtmlByID('tm_code',{txtID:"txt5",func:"checkCode" });
+		cache_code=createCode('checkCode');
+		$$("L4Info").innerHTML="已注册的商家ID";
+		for(var i=1;i<6;i++)cache_error["txt" + i.toString()]=false;	
+	}
+	//注册·顾客
+	function loadSignin3(){
+		var data={type:3, topic:["用户名","密码","确认密码","手机号码","验证码" ] };
+		var T=loadPublic(data);
+		$$("L4Main").innerHTML='<input type="text" id="txt4" placeholder="请输入联系方式" onkeyup="this.value=keepNum(this.value)"  onafterpaste="this.value=keepNum(this.value)"'+ T +' />';
+		$$("L5Main").innerHTML=getHtmlByID('tm_code',{txtID:"txt5",func:"checkCode" });
+		cache_code=createCode('checkCode');
+		$$("L4Info").innerHTML="可用于手机号码登录，及找回密码";
+		$$("L5Info").innerHTML="不区分大小写";		
+		for(var i=1;i<6;i++)cache_error["txt" + i.toString()]=false;	
+	}	
+	//*********************************End·layout*****************************
+	
+	function keepNum(value) {
+		return value.replace(/\D/g,'');
+	}
+	//验证验证码
+	function checkCode(id,value){
+		var txt="";
+		var bCheck=false;
+		var err=0;
+		var index=parseInt(id.substr(3,1));
+		if(value.length==""){ cache_error[id]=false; setInfo(index,txt,err); return; }
+		switch(index){
+			case 5:
+				if(value.length <=0){ txt=" 请输入验证码！"; err++ }
+				if(value.toUpperCase() != cache_code){ txt=" 验证码输入错误！"; err++ }
+				setInfo(index,txt,err);
+				break;
+		}
+		if(err==0)bCheck=true;
+		cache_error[id]=bCheck;
+	}
+	//验证所有
+	function checkValue(id,value){
+		var txt="";
+		var bCheck=false;
+		var err=0;
+		var index=parseInt(id.substr(3,1));
+		if(value.length==""){ cache_error[id]=false; setInfo(index,txt,err); return; }
+		switch(index){
+			case 1:
+				txt=" 可以使用！";
+				if(value.length<5){	txt=" 用户名太短！"; err++; }
+				if(!checkString(value)){ txt=" 用户名含有非法字符！"; err++; }	
+				setInfo(index,txt,err);
+				break;
+			case 2:
+				if($$("txt2").value=="" || $$("txt3").value=="")return;
+				if($$("txt2").value!=$$("txt3").value){ txt=" 两次填写的密码不一致！"; err++; }
+				setInfo(index+1,txt,err);
+				break;
+			case 3:
+				if($$("txt2").value!=$$("txt3").value){ txt=" 两次填写的密码不一致！"; err++; }
+				setInfo(index,txt,err);
+				break;
+			case 4:
+				var lg=!isNaN(value)?4:2;
+				if(value.length<lg){	txt=" 内容太短！"; err++; }
+				setInfo(index,txt,err);
+				break;
+			case 5:
+				if(value.length<6){	txt=" 号码格式不正确，请检查！"; err++; }
+				setInfo(index,txt,err);
+				break;
+			case 8:
+				if(value.length <=0){ txt=" 请输入验证码！"; err++ }
+				if(value.toUpperCase() != cache_code){ txt=" 验证码输入错误！"; err++ }
+				setInfo(index,txt,err);
+				break;
+		}
+		if(err==0)bCheck=true;
+		cache_error[id]=bCheck;
+		if(index==2)
+			cache_error["txt3"]=bCheck;
+		else if(index==3)
+			cache_error["txt2"]=bCheck;
+	}
+	function subSignIN(type){
+		var signData={'type':type };
+		if(type==1){
+			if($$("ddlProvince").value=="" || $$("ddlCity").value==""){
+				setInfo(6," 请选择商家所在的省份和城市",1);return;
+			}
+			cache_error['txt6']=true;
+			setInfo(6,"",0);
+			signData['province']=$$("ddlProvince").value;
+			signData['city']=$$("ddlCity").value;
+			signData['tel']=$$("txt5").value;
+			signData['addr']=$$("txt7").value;
+		}
+		for(var v in cache_error){
+			if(!cache_error[v]){ alert("请补充填写所有材料！"); return; }
+		}
+		signData['userName']=$$("txt1").value;
+		signData['passwd']=$$("txt2").value;
+		var key=(type!=3)?'shop':'tel';
+		signData[key]=$$("txt4").value;
+//		out(signData);return;
+		btnCtl(0); //按钮不可用		
+		ajaxData(PUB_cfg.ajaxURL + '/signin',signData,"",function(data){
+			if(data.error==undefined){
+				alert("注册成功！");
+				if(type!=3)window.location.href="login.html";
+			}else{
+				alert("验证不通过，请检查所填资料");	
+			}
+			btnCtl(1);
+		},function(){
+			alert("系统繁忙！,请稍后再试");
+			btnCtl(1);
+		});
+	}
+	function btnCtl(type){
+		if(type==0){
+			$$("btnReg").disabled="false";
+			$$("btnReg").style.backgroundColor="#ccc";
+		}else{
+			$$("btnReg").disabled="true";		
+			$$("btnReg").style.backgroundColor="#218868";
+		}
+	}
+	function checkString(value){
+		var st=["|",",","，","*","(",")",";","'"];
+		for(var i=0;i<st.length;i++)
+			if(value.indexOf(st[i])!=-1)return false;
+		return true;
+	}
+	//提示信息
+	function setInfo(index,txt,type){
+		var id="L"+ index.toString()+"Error";
+		$$(id).innerHTML=txt;
+		$$(id).style.color=(type==0)?"green":"red";
+	}
+	function checkUser(value){
+		ajaxData("/signin",{userName:value},"lb_rst",function(data){
+			if(data.error==0){
+				setInfo("用户名可用！",1);	
+			}else{
+				setInfo("该用户名已被注册！",0);	
+			}
+		},function(){
+			setInfo("系统繁忙！",0);
+		});
+	}
+</script>
+
+<script type="text/javascript" language ="javascript"> 
+         BindCity("成都"); 
+ </script>
+
+
+</body>
+</html>

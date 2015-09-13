@@ -1,0 +1,285 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="JS/ejs/ejs.js"></script>
+<script type="text/javascript" src="JS/json2.js"></script>
+<script type="text/javascript" src="JS/public.js"></script>
+<script type="text/javascript" src="JS/jquery.min.js"></script>
+<script type="text/javascript" src="JS/bootstrap.min.js"></script>
+<script type="text/javascript" src="JS/order.js"></script>
+<script type="text/javascript" src="JS/jquery.easyui.min.js"></script> 
+<script  type="text/javascript" src="head.js"></script>
+
+<link rel="stylesheet" href="Css/public.css" type="text/css" />
+<link rel="stylesheet" type="text/css" href="Css/easyui.css"> 
+<link rel="stylesheet" href="Css/icon.css" />
+
+
+<style type="text/css">
+.main{width:95%; margin:20px 1% 10px 5%;}
+#desk_sel{color:#F03; font-weight:100}
+#dv_desk{ width:25%; border-top:1px solid #036;min-height:500px;float:left}
+#dv_list{ width:68%; border:1px solid #036;min-height:500px;float:left}
+#dv_mark{ width:90%; padding:0px 5% 10px 5%;}
+
+.rect{ border:thin 1px ;
+	margin:2px; min-width:20px; background-color:#FFF;width:40px;height:25px; text-align:center; cursor:pointer; border:1px #066 solid
+	}
+.c_btn{ width:80px;margin-top:10px; height:25px;border:#066 1px solid}
+.pdTop{ padding-top:5px; padding-left:2px}
+.sDiv{ float:right; margin-right:16px}
+.btn1{ width:58%; margin-top:5px; margin-bottom:5px}
+.btn2{ width:25%; margin-left:3px;margin-top:5px; margin-bottom:5px}
+.btnb{ background-color:#6CF; color:#F03; font-weight:100; height:30px}
+.btnc{ height:30px; margin-right:20px}
+#panel1{ min-height:300px; height:auto }
+th{ min-width:10px}
+</style>
+
+<div class="main">
+	<div id="desk_sel">&nbsp;</div>
+	<div id="dv_desk">&nbsp;</div>
+	<div id="dv_sel">
+    	<div id="dv_list">
+        	<div id="panel1"></div>
+            <div class="center clear">
+            	<div class="floatL w6" style=" padding-top:12px"><label id="money" class="red">总金额：</label></div>
+                <div class="floatL w4">
+                   	<input type="button" value="取消" class="c_btn btnc btn-default"  onclick="javascripts:confirmSub(0);" />
+                	<input type="button" value="结算" class="c_btn btnb btn-default" onclick="javascripts:confirmSub(1);" />
+				</div>
+            </div>
+            <div style="padding-left:10px" id="balanceList">
+            	清单：
+            	<!------详情------->
+            </div>
+        </div>
+</div>
+</div>
+
+<!---------------------------组件--------------------------->
+<div class="hide" id="divHide">
+	<div id="listAll">
+        <table id="tListAll">
+            <div id="tb">
+            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon_remove_',plain:true" onClick="javascripts:;" ></a>
+            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onClick="javascripts:loadDataSingle();" ></a>
+            <div class="sDiv"><input id="search_names" title="tListAll" class="easyui-searchbox" searcher="doSearch" prompt="请输入搜索内容" style="width:130px" /></div>
+            </div>
+    	</table> 
+    </div>
+    
+</div>
+<!-----------------------End·组件--------------------------->
+
+<div style="padding:10px 5% 20px 5%; width:90%" >
+
+
+</div>
+<script id="tm_desk" type="text/template">
+	<% var index=1;%>
+	<% for(var i=0;i<desk.maxDesk;i++){ %>
+		<div class="rect floatL" id="desk<%= index %>" 
+		onclick="javascript:ckDesk('desk<%= index %>')" 
+		onmousemove="javascript:changeColor('desk<%= index %>')"
+		onMouseout="javascript:revertColor('desk<%= index %>')"
+		><%= index %></div>
+		<% index++; %>
+		<% if(index==desk.maxDesk+1)break; %>
+
+	<% } %>
+	
+</script>
+
+<script>
+	var $j=$.noConflict();
+	var PUB_cfg=getConfig();
+	var PUB_user=getUser();	
+	var __ListData=[];
+	panel1.innerHTML=listAll.innerHTML;
+	divHide.innerHTML="";
+	loadDataGrid(tListAll,1);
+	$j('#tListAll').datagrid({toolbar: '#tb'});
+	$j('#tListAll').datagrid({title:'单桌账单 - 未选定桌号'}); 
+	showColumns(tListAll,["numb","dish","price","desk","count","user","date","state","mState","check_tListAll"]);
+	//***********************
+	var cache_ready=0;
+	var cache_shopId=PUB_user.shop;
+	var cache_personId=PUB_user.user;
+	var cache_desk={};
+	var cache_cfg={};
+	var cache_desk_now="";
+	var cache_onlykey_now="";
+	
+	onload = function(){
+	var count=100;
+	var colCount=parseInt($$("dv_desk").offsetWidth/13);
+	var rowCount=Math.ceil(count/colCount);
+	var dt={perCount:10};  
+	var data={title:'Hello moto',desk:{
+		perWidth:10,maxDesk:100,colCount:colCount,rowCount:rowCount}
+	};
+	var tm_desk = document.getElementById('tm_desk').innerHTML;  
+	var html = ejs.render(tm_desk, data);	
+    dv_desk.innerHTML = html;  //End EJS
+	cache_cfg={desk:{color:"#FFF",selColor:"#0C9",mouseColor:"#6CC",nowColor:"#F66",usedColor:"#C00"}};
+	//cache_cfg={desk:{color:"#FFF",selColor:"#0C9",mouseColor:"#6CC",nowColor:"#C00",usedColor:"#F66"}};
+	//**************************请求数据
+	ajaxData(PUB_cfg.ajaxURL + '/keyNow',{shopId:cache_shopId},'desk_sel',function (data) {
+			var dsk={};//记录已有桌子
+			if(data.error==undefined){
+				for(var i=0;i<data.length;i++){
+					var id=data[i].tid;
+					var state=data[i].ostate;
+					dsk[id]={code:data[i].okey,state:state,onlykey:data[i].onlykey };
+					var color=(state==1)?cache_cfg.desk.selColor:cache_cfg.desk.usedColor;
+					$$("desk" + id).style.backgroundColor=color;										
+				}
+				cache_ready=1;
+			}		
+			cache_desk=dsk;
+		}
+	);	
+	//**************************End·请求数据	
+    }  //End OnLoad
+	//**************************************其它处理函数
+	//操作确认
+	function confirmSub(style){
+		$j("#tListAll").title=0;
+		var rows = $j("#tListAll").datagrid('getRows');
+		var ids=[];
+		var indexs=[];
+		for(var i=0;i<rows.length;i++){
+			var id="id" + rows[i]['numb'];
+			if(rows[i]['mState']=="已付款" || rows[i]['state']=="已取消")continue;
+			if($$(id).checked){
+				ids.push(rows[i]['numb']);
+				indexs.push(i);
+			}
+		}
+		var txt="即将取消 " + ids.length + " 个订单, 是否继续？";
+		if(style==1)txt="即将提交 " + ids.length + " 个订单, 是否提交？";
+		$j.messager.confirm('确认',txt,function(r){ if (r)
+			if(style==0)cancelBalance({ rows:rows, ids:ids, indexs:indexs }) ;
+			else if(style==1)balance({ rows:rows, ids:ids, indexs:indexs }) ;
+		});
+	}
+	//取消订单
+	function cancelBalance(tp){
+		var tp=confirmSub(0);
+		if(!tp)return;		
+		var rows = tp.rows;
+		var ids=tp.ids;
+		var indexs=tp.indexs;
+		$j("#tListAll").title=1;
+		if(ids.length==0){ alert("该桌无剩余可取消订单！"); return; }
+		var data={ids:ids,pid:cache_personId,shopId:cache_shopId,onlykey:cache_onlykey_now};
+		$j(tListAll).datagrid('loading');
+		ajaxData(PUB_cfg.ajaxURL + "/balanceCancel",{data:JSON.stringify(data)},'money',function(data){
+			if(data.error==undefined){
+				money.innerHTML="成功取消订单：" + data.count + "个";
+			}else{
+				money.innerHTML="取消失败，请重试！";
+			}
+			loadDataSingle();
+			$j(tListAll).datagrid('loaded');
+		});
+	}
+	//结算
+	function balance(tp){
+		if(!tp)return;
+		var rows = tp.rows;
+		var ids=tp.ids;
+		var indexs=tp.indexs;		
+		if(ids.length==0){ alert("该桌无剩余未付款订单！"); $j("#tListAll").title=1; return; }
+		var data={ids:ids,pid:cache_personId,shopId:cache_shopId,onlykey:cache_onlykey_now};
+		$j(tListAll).datagrid('loading');
+		ajaxData(PUB_cfg.ajaxURL + "/balanceSub",{data:JSON.stringify(data)},'money',function(data){
+			if(data.error==undefined){
+				money.innerHTML="总金额：" + data.money + "元";
+				var txt="<br />总单数：" + data.count + "<br />清单如下：<br />";
+				txt+="<table>"
+				txt+="<tr><th>商品</th><th>单价 </th><th> 数量</th></tr>";
+				for(var i=0;i<indexs.length;i++){
+					txt+="<tr><td>"+rows[i]['dish'] + "</td><td>" + rows[i]['price'] + "</td><td>" + rows[i]['count'] + "</td></tr>" ;
+				}
+				txt+="<tr><td>共计：</td><td>"+ data.money + "元</td></tr>";
+				txt+="</table>";
+				balanceList.innerHTML=txt;
+			}else{
+				money.innerHTML="结算失败，请重试！";
+			}
+			loadDataSingle();
+			$j(tListAll).datagrid('loaded');
+			$j("#tListAll").title=1;
+		});
+	}
+	function ckDesk(id){
+		if(cache_ready==0){ desk_sel.innerHTML="请稍候重试！"; return; }
+		var oldID=cache_desk_now;
+		if(oldID!=id || cache_desk_now==""){
+			if(oldID!=""){
+				var R=used(oldID);
+				var color=R.rst?cache_cfg.desk.usedColor:cache_cfg.desk.color;
+				if(R.rst && R.state==2)color=cache_cfg.desk.usedColor;
+				if(R.rst && R.state==1)color=cache_cfg.desk.selColor;
+				$$(oldID).style.backgroundColor=color;//旧的
+			}
+			$$(id).style.backgroundColor=cache_cfg.desk.nowColor;
+		}
+		var data=used(id);
+		cache_desk_now=id;
+		if(!data.rst || data.state!=2){
+			cache_onlykey_now="";	
+			desk_sel.innerHTML="&nbsp;&nbsp;" + data.num.toString() + " 号桌空闲中 !";	
+			if(data.state==1)desk_sel.innerHTML="&nbsp;&nbsp;" + data.num.toString() + " 号桌无订单 !";				
+			clearAll(tListAll);	
+		}else{
+			cache_onlykey_now=cache_desk[data.num].onlykey;
+			desk_sel.innerHTML="";
+			loadDataSingle();
+		}
+		
+	}
+	function loadDataSingle(){
+		var onlykey=cache_onlykey_now;
+		if(cache_desk_now=="")return;
+		$j(tListAll).datagrid('loading');
+		$j(tListAll).datagrid({title:"单桌账单 - " + cache_desk_now.substr(4) + "号桌" });
+		getDataBalance(cache_shopId,onlykey,function(data){
+			__ListData=data;
+			$j(tListAll).datagrid('loadData',__ListData);
+			var moneySum=0.0;
+			for(var i=0;i<__ListData.length;i++){
+				moneySum+=parseFloat(__ListData[i]['price']) * (__ListData[i]['count']) ;
+			}
+			money.innerHTML="总金额： " + moneySum + "元";
+			$j(tListAll).datagrid('loaded');
+		});
+	}
+	function changeColor(id){
+		var data=unUsed(id);
+		if(data.rst)$$(id).style.backgroundColor=cache_cfg.desk.mouseColor;
+	}
+	function revertColor(id){
+		var num=parseInt(id.substr(4));  //取数字
+		var data=unUsed(id);
+		if(data.rst)$$(id).style.backgroundColor=cache_cfg.desk.color;
+	}
+	//判断当前id
+	function unUsed(id){
+		var num=parseInt(id.substr(4));  //取数字
+		var data={ rst:undefined==cache_desk[num] && id!=cache_desk_now,num:num };
+		return data;
+	}
+	function used(id){
+		var num=parseInt(id.substr(4));  //取数字
+		var u=false;
+		if(undefined!=cache_desk[num])u=true;
+		var data={ rst:u ,num:num };
+		data['state']=-1;
+		if(cache_desk[num])data['state']=cache_desk[num].state;
+		return data;
+	}
+	
+	
+</script>
+<script  type="text/javascript" src="tail.js"></script>
