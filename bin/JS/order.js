@@ -2,12 +2,12 @@
 //加载表格
 function loadDataGrid(listId,style){
 	var style = arguments[1] ? arguments[1] : -1;
-	var parent=listId.parentNode.id;
+	var parent=$j(listId).attr("parentId");
 	var width=parseFloat($$(parent).offsetWidth);
 //	var colInfo=getOrderFields(style);
 	var cols=getOrderColumns(listId,style);
 	$j(listId).datagrid({ 
-	title:'', iconCls:'icon-sum', width:width, height:300, singleSelect:true, columns:cols, halign:'center',remoteSort:false,fitColumns:true,onClickCell:onClickCell,fit:true
+	title:'', iconCls:'icon-sum', width:width, height:300, singleSelect:true, columns:cols, halign:'center',remoteSort:false,onClickCell:onClickCell,fit:true,GridLines:false,scrollbarSize:15
 	}).datagrid('acceptChanges'); 
 	listId.title=1;
 }
@@ -15,31 +15,35 @@ function getOrderFields(listId,style){
 	var style = arguments[1] ? arguments[1] : -1;
 	var colIds=["numb","dish","desk","pid","count","user","mark","state","date","cancel","class","action"];
 	var colNames=["订单号","菜品","桌号","厨师","数量","用户","备注","打印状态","时间","用户请求","类别","操作"];
+	var isShow=[true,true,true,false,true,false,false,true,true,true,false,true];
 	if(style==1){
 		colIds=["numb","dish","price","desk","count","onlykey","user","date","state","mState","check_" + listId.id];
 		colNames=["订单号","菜品","单价","桌号","数量","标示","用户","时间","状态","付款状态","选中"];	
+		isShow=[true,true,false,true,true,false,false,true,true,false,false];
 	}
 	var data=[];
 	for(var i=0;i<colIds.length;i++){
-		data.push( {id:colIds[i], name:colNames[i]} );
+		data.push( {id:colIds[i], name:colNames[i], show:isShow[i]} );
 	}
 	return data;
 }
+
 function getOrderColumns(listId,style){
 	var style = arguments[1] ? arguments[1] : -1;
 	var F=getOrderFields(listId,style);
-	var parent=listId.parentNode.id;
+	var count=0;
+	for(var i=0;i<F.length;i++)if(F[i].show)count++;
+	var parent=$j(listId).attr("parentId");
 	var width=parseFloat($$(parent).offsetWidth);
-	var w=(((width)/100)).toFixed(3);
-	var ws=[width/F.length]; //列宽
-	var cols=[[]];
+	var ws=[(width-15)/count-1]; //列宽
+	var cols=[[]]; 
 	for(var i=0;i<F.length;i++){	//editor:numberbox,text,datebox
 		var dt={field:F[i].id,width:ws[0],title:F[i].name,align:'center',hidden:true,editor:'text',sortable:true};
-		cols[0].push(dt);
+		cols[0].push(dt);	//out(dt);
 	}
 	(cols[0][cols[0].length-1])['formatter']=function(value,row,index){
-		var s='<button type="button" class="btnb _btn2 btn-default icon_ok" style="width:60%;border:1px solid #ccc; height:30px" title="出菜" onclick="javascripts:dishOK('+ listId.id + ','+ row['numb'] +')"></button>'; 
-		var c='<button type="button" class="btnb _btn2 btn-default icon_remove_" style="width:40%;border:1px solid #ccc; height:30px" title="取消" onclick="javascripts:dishDel('+ listId.id + ','+ row['numb'] +')"></button>'; 
+		var s='<label class="_btn2" style="width:60%" title="出菜" onclick="javascripts:dishOK('+ listId.id + ','+ row['numb'] +')">出菜</label>'; 
+		var c='<lebal class="_btn2 icon-cancel" style="width:30%;min-width:20px" title="取消" onclick="javascripts:dishDel('+ listId.id + ','+ row['numb'] +')">&nbsp;</label>'; 
 		return s + c; 
 	};
 	if(style==1){

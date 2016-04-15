@@ -1,0 +1,202 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>呼叫管理</title>
+<script type="text/javascript" src="JS/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="JS/public.js"></script>
+<script  type="text/javascript" src="head.js"></script>
+<script type="text/javascript" src="JS/ejs/ejs.js"></script>
+<script type="text/javascript" src="JS/json2.js"></script>
+<script type="text/javascript" src="JS/bootstrap.min.js"></script>
+<script type="text/javascript" src="JS/order.js"></script>
+<script type="text/javascript" src="JS/jquery.easyui.min.js"></script> 
+
+<link rel="stylesheet" href="Css/public.css" type="text/css" />
+<link rel="stylesheet" type="text/css" href="Css/easyui.css"> 
+<link rel="stylesheet" href="Css/icon.css" />
+</head>
+<style type="text/css">
+#panel1{ min-height:500px; height:auto; width:85%; margin:20px 5% 30px 3% }
+th{ min-width:10px}
+#tListAll{ width:68%; border:1px solid #036;min-height:300px;}
+.sDiv{ float:right; margin-right:16px}
+.datagrid-btable tr{height: 40px;}
+.dealcall{margin:5px;width:60px;height:20px;border:1px solid #ccc;cursor:pointer;color:red }d
+
+</style>
+
+
+<body>
+
+<div id="panel1"></div>
+
+<!---------------------------组件--------------------------->
+<div class="hide" id="divHide">
+	<div id="listAll">
+        <table id="tListAll" parentId="panel1">
+            <div id="tb">
+            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onClick="javascripts:Reload();" ></a>
+            <div class="sDiv"><input id="search_names" title="tListAll" class="easyui-searchbox" searcher="doSearch" prompt="请输入搜索内容" style="width:130px" /></div>
+            </div>
+    	</table> 
+    </div>
+    
+</div>
+<!-----------------------End·组件--------------------------->
+
+
+
+<script language="javascript">
+	var PUB_cfg=getConfig();
+	var PUB_user=getUser();	
+	var ListData=[];
+	panel1.innerHTML=listAll.innerHTML;
+	divHide.innerHTML=""; //隐藏组件
+	Reload();
+	
+	//***********************
+	var cache_ready=0;
+	var cache_shopId=PUB_user.shop;
+	var cache_personId=PUB_user.user;
+	
+	function Reload(){
+		loadDataGrid("tListAll");
+		$j('#tListAll').datagrid({ toolbar:'#tb', title:" 当前服务呼叫"});	
+	}
+	//设置子窗体样式· 网格效果·全局
+	function SetClassStyle(){
+		var tr = $j('table.datagrid-btable').find('tr');  // out(tr); return;
+		tr.each(function(){  
+            var td = $j(this).children(); 
+			td.each(function(){
+				$j(this).css({   
+					"border-bottom": "dotted 1px #ccc","border-left": "none","border-right": "none"
+				});   		
+			});
+		});
+	}
+	//分页
+	function LoadPages(ListView,data){
+		$j(ListView).datagrid({   
+				fitColumns:true,  
+	            pagination:true,  
+    	        data:ListData.slice(0,10),  
+				pageList: [5, 10, 15],
+            }); 
+			var pager = $j(ListView).datagrid("getPager");  
+            pager.pagination({  
+                total:ListData.length,  
+				beforePageText: '第',//页数文本框前显示的汉字  
+				afterPageText: '页  ，  共 {pages} 页',  
+				displayMsg: '当前显示 ： {from} - {to} 条记录  ， 共 {total} 条',
+                onSelectPage:function (pageNo, pageSize) {  
+                    var start = (pageNo - 1) * pageSize;  
+                    var end = start + pageSize;  
+                    $j(ListView).datagrid("loadData", ListData.slice(start, end));  
+                    pager.pagination('refresh', {  
+                        total:ListData.length,  
+						pageSize:10,
+                        pageNumber:pageNo,
+                    });  
+					SetClassStyle();
+                }  
+            });  
+	}
+		
+	//加载表格和数据
+	function loadDataGrid(ListId){
+		var ListView=document.getElementById(ListId);
+		initDataGrid(ListView);
+		getDataCall(cache_shopId,function(data){
+			ListData=data; 
+			LoadPages(ListView,data);
+			$j(ListView).datagrid('loaded');
+			SetClassStyle();
+		});
+	}
+	//设置外观
+	function initDataGrid(listId){
+		var parent=$j(listId).attr('parentId');
+		var width=parseFloat($$(parent).offsetWidth);
+		var cols=getOrderColumns(listId);
+		$j(listId).datagrid({ 
+			title:'', iconCls:'icon-call', width:width, height:300, singleSelect:true, columns:cols, halign:'center',remoteSort:false,fitColumns:true,onClickCell:onClickCell,fit:true,pagination:true,
+		}).datagrid('acceptChanges'); 
+		$j(listId).datagrid('loading');
+	}
+	//设置列头
+	function getFields(){
+		var colIds=["numb","did","user","mark","date","deal"];
+		var colNames=["流水号","桌号","用户","备注","时间","操作"];
+		var data=[];
+		for(var i=0;i<colIds.length;i++){
+			data.push( {id:colIds[i], name:colNames[i]} );
+		}
+		return data;
+	}
+	//特殊单元
+	function getOrderColumns(listId){
+		var F=getFields();
+		var parent=$j(listId).attr('parentId');
+		var width=parseFloat($$(parent).offsetWidth);
+		var w=(((width)/100)).toFixed(3);
+		var ws=[width/F.length]; //列宽
+		var cols=[[]];
+		for(var i=0;i<F.length;i++){	//editor:numberbox,text,datebox
+			var dt={field:F[i].id,width:ws[0],title:F[i].name,align:'center',hidden:false,editor:'text',sortable:true};
+			cols[0].push(dt);
+		}
+		(cols[0][cols[0].length-1]).formatter=function(value,row,index){
+			var s='<label class="dealcall" title="处理后将删除此项" onclick="javascripts:dealCall('+ listId.id + ','+ row['numb'] +')">处理</label>'; 
+			return s; 
+		};
+		return cols;
+	}
+	//处理呼叫
+	function dealCall(listId,id){
+		$j.ajax({
+			url: PUB_cfg.ajaxURL + '/dealCall', //PUB_cfg.ajaxURL
+			dataType: "jsonp",	 
+			data: {id:id,shopId:PUB_user.shop,user:PUB_user.user},
+			type: 'get',
+			jsonpCallback: 'callback2', 
+			success: function (data) {
+				if(data['error']!='undefined'){
+					deleteByNumb(listId,id);
+				}
+			},
+			error: function (xhr, status, error) {
+				alert(error.message);
+			}
+		});	
+	}
+	//请求数据
+	function getDataCall(shopId,callback){
+		$j.ajax({
+			url: PUB_cfg.ajaxURL + '/callInfo', //PUB_cfg.ajaxURL
+			dataType: "jsonp",	 
+			data: { shopId:PUB_user.shop, uid:PUB_user.user },
+			type: 'get',
+			jsonpCallback: 'callback1', 
+			success: function (data) {
+				if(data['error']!='undefined'){ 
+					var newData=[];
+					for(var i=0;i<data.length;i++){
+						var T=data[i];    
+						var desk=getDeskId(T.onlykey);
+						var mark=T.cmark==""?"无":T.cmark;
+						var row={ numb:T.cid, did:desk, user:T.uid, mark:mark, date:getTimeSmall(T.cbtime),deal:""};
+						newData.push(row);
+					}
+					callback(newData);		
+				}
+			},
+			error: function (xhr, status, error) {
+				alert(error.message);
+			}
+		});		
+	}
+
+</script>
+
+
+</body>
+</html>

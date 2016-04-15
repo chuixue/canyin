@@ -1,4 +1,5 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="JS/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="JS/ejs/ejs.js"></script>
 <script type="text/javascript" src="JS/json2.js"></script>
 <script type="text/javascript" src="JS/public.js"></script>
@@ -98,7 +99,11 @@
 					var state=data[i].ostate;
 					dsk[id]={code:data[i].okey,state:state};
 					var color=(state==1)?cfg.desk.selColor:cfg.desk.usedColor;
-					$$("desk" + id).style.backgroundColor=color;										
+					try{
+						$$("desk" + id).style.backgroundColor=color;										
+					}catch(e){
+						
+					}
 				}
 				desk_sel.innerHTML="共" + data.length + "桌";
 				cache_ready.innerHTML="1";
@@ -121,7 +126,7 @@
 		if(data.isData){//使用中，不可取消
 			desk_sel.innerHTML=data.dsk[data.num].code + " (" + data.num + "号桌)";
 			cache_desk_now.innerHTML="";
-			$$(oldID).style.backgroundColor=data.cfg.desk.color;//旧的
+			if($$(oldID))$$(oldID).style.backgroundColor=data.cfg.desk.color;//旧的
 			return;		
 		} 
 		if(oldID==id){

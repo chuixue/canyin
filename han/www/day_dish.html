@@ -1,0 +1,156 @@
+<script src="head.js"></script>
+<meta charset="utf-8" />
+   <script type="text/javascript" src="myjs/jquery-1.3.2.js"></script>
+   <script type="text/javascript" src="myjs/nav.js"></script>
+   <script type="text/javascript" src="myjs/jquery-1.8.3.min.js"></script>
+   <script type="text/javascript" src="myjs/book.js"></script>
+   <script type="text/javascript" src="myjs/order.js"></script>
+   <script type="text/javascript" src="myjs/vip.js"></script>
+   <script type="text/javascript" src="datepicker/WdatePicker.js"></script>
+   <link href="css/chart.css" rel="stylesheet">
+    
+   <script type="text/javascript" src="1/jquery.js"></script>
+   <script type="text/javascript" src="1/jquery-ui.js"></script>
+   <link href="1/jquery-ui.css" rel="stylesheet">
+   <style type="text/css">
+   #tabs{width:50%;margin:0 auto; height:120px;background-color:red;} 
+   #tabs ul li{float:left;list-style-type:none;margin-right:2px;}          
+   </style>
+<script>
+  $(function() {
+    $( "#tabs" ).tabs();
+  });
+  $(function() {
+    $( "#datepicker" ).datepicker();
+  });
+  </script>
+   
+    
+ 
+   
+   <input id="d11" type="text" onClick="WdatePicker()"/>
+   <input id="d12" type="text"/>
+   <img onclick="WdatePicker({el:'d12'})" src="datepicker/skin/datePicker.gif" width="16" height="22" align="absmiddle">
+<div id="tabs">
+  <ul>
+    <li><a href="#tabs-1">每日销量</a></li>
+    <li><a href="#tabs-2">每月销量</a></li>
+    <li><a href="#tabs-3">每年销量</a></li>
+	<li><a href="#tabs-3">季度销量</a></li>
+	<li><a href="#tabs-3">全部销量</a></li>
+	<li><a href="#tabs-3">自定义型</a></li>
+  </ul>
+  <div id="tabs-1">
+    <p>  日期：<input type="text" id="datepicker">  </p>
+  </div>
+  <div id="tabs-2">
+    <p> 123</p>
+  </div>
+  <div id="tabs-3">
+    <p>456</p>
+   </div>
+</div>
+
+
+
+   <div class="chart"> 
+   <div id="dish_chart" style="height:500px">  </div>
+   <script type="text/javascript">
+   window.onload=function (){  data(); }
+   </script>
+   
+     <script src="echarts/dist/echarts.js"></script>
+	 <script src="echarts/dist/echarts-all.js"></script> 
+    <script type="text/javascript">
+	function data(){
+	   var arr1=[];//横坐标数据
+	   var arr2=[];//纵坐标数据
+	   var dataArr=new Array();	  
+	    $.ajax({		
+		url: 'http://cins.swpu.edu.cn:8003/sql',  //跨域请求请加域名前缀：http://cins.swpu.edu.cn:8003
+		dataType: "jsonp",	 
+		data: {sql: "select dname,dcount from dish"},    //附加数据请用json表示
+		type: 'post',
+		async:false,
+		jsonpCallback: 'callback', 
+		success:function (data){
+ 	  			  
+			for(var i=0;i<data.length;i++){
+				   arr1[i]=data[i].dname;
+				   arr2[i]=data[i].dcount;
+			}
+			  dataArr.push(arr1);
+	          dataArr.push(arr2);
+	      
+		  // 路径配置
+        require.config({
+            paths: {
+                echarts:'echarts/dist'  
+            }
+        });        
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/line' //  折线图
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                var myChart = ec.init(document.getElementById('dish_chart')); 
+              var  option = {
+			  title : {
+                       text: '各种菜品销量', 
+                   },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['菜品销量']  //用于设置图例，data内的字符串数组需要与sereis数组内每一个series的name值对应；
+    },     
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            data :dataArr[0]   //横坐标数据，用于设置x轴的刻度，类型为字符串数组
+							        
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'菜品销量',
+            type:'line',
+            stack: '总量',
+            data:dataArr[1] //纵坐标数据，用于设置图表数据之用。series是一个对象嵌套的结构；对象内包含对象；
+        },
+         
+         
+         
+    ]
+};                                   
+                // 为echarts对象加载数据 
+                myChart.setOption(option); 
+            }
+        );
+		  
+		  
+			 
+			 }
+			
+			
+		 
+   });
+	          
+	   
+        
+		}
+    </script>  
+	</div>
+
+
+<script src="tail.js"></script>

@@ -3,7 +3,8 @@
 
 .halfW{ width:50%; min-width:20px}
 .halfH{ height:50%}
-.allW{ width:100%}
+.allW{ width:100%; min-height:10px}
+.allH{ height::100%; min-width:10px}
 .floatL{ float:left}
 .floatR{ float:right}
 .clear{ overflow:hidden;zoom:1}
@@ -22,6 +23,8 @@
 .w25{ width:25%}
 .w28{ width:28%}
 .red{ color:red}
+.blue{ color:blue}
+.green{ color:green}
 
 .bdnb{ border:0px; height:25px }
 .pdTop{ padding-top:9px; padding-left:10px}

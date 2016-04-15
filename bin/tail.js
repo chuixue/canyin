@@ -1,74 +1,62 @@
-document.write('    <!-- tail start here -->');
-document.write('    </div>');
-document.write('    <!-- /content -->');
-document.write('');
-document.write('');
-document.write('    <!-- / aside right -->');
-document.write('');
-document.write('    <!-- footer -->');
-document.write('    <div style=" border:1px solid #ccc;line-height:30px; font-size:18px;width:100%; height:50px;padding:10px 0px 10px 20px;margin-left:200px">');
-document.write('      <span class="pull-right">1.0.0 <a href="#app" class="m-l-sm text-muted"><i class="fa fa-long-arrow-up"></i></a></span>');
-document.write('      &copy; 2014 Copyright.  <a href="http://www.cssmoban.com/" target="_blank" title="CRM">CRM后台管理系统</a> - Collect from <a href="http://www.cssmoban.com/" title="CRM" target="_blank"></a>');
-document.write('    </div>');
-document.write('    <!-- / footer -->');
-document.write('  </div>');
-document.write('  <!-- jQuery -->');
-document.write('  <script src="vendor/jquery/jquery.min.js"></script>');
-document.write('  <script src="vendor/jquery/bootstrap.js"></script>');
+﻿$j.ajaxSetup({ async: false });  
 
-document.write(' <script type="text/javascript">');
-document.write("    +function ($) {\n");
-document.write("      $(function(){\n");
-document.write("        // class\n");
-document.write("        $(document).on('click', '[data-toggle^="+'"class"'+"]', function(e){");
-document.write("          e && e.preventDefault();\n");
-document.write("          console.log('abc');\n");
-document.write("          var $this = $(e.target), $class , $target, $tmp, $classes, $targets;\n");
-document.write("          !$this.data('toggle') && ($this = $this.closest('[data-toggle^="+'"class"' +"]'));");
-document.write("          $class = $this.data()['toggle'];\n");
-document.write("          $target = $this.data('target') || $this.attr('href');\n");
-document.write("          $class && ($tmp = $class.split(':')[1]) && ($classes = $tmp.split(','));\n");
-document.write("          $target && ($targets = $target.split(','));\n");
-document.write("          $classes && $classes.length && $.each($targets, function( index, value ) {\n");
-document.write("            if ( $classes[index].indexOf( '*' ) !== -1 ) {\n");
-document.write("              var patt = new RegExp( '\\s' + \n");
-document.write("                  $classes[index].\n");
-document.write("                    replace( /\\*/g, '[A-Za-z0-9-_]+' ).\n");
-document.write("                    split( ' ' ).\n");
-document.write("                    join( '\\s|\\s' ) + \n");
-document.write("                  '\\s', 'g' );\n");
-document.write("              $($this).each( function ( i, it ) {\n");
-document.write("                var cn = ' ' + it.className + ' ';\n");
-document.write("                while ( patt.test( cn ) ) {\n");
-document.write("                  cn = cn.replace( patt, ' ' );\n");
-document.write("                }\n");
-document.write("                it.className = $.trim( cn );\n");
-document.write("              });\n");
-document.write("            }\n");
-document.write("            ($targets[index] !='#') && $($targets[index]).toggleClass($classes[index]) || $this.toggleClass($classes[index]);\n");
-document.write("          });\n");
-document.write("          $this.toggleClass('active');\n");
-document.write("        });\n");
-document.write("\n");
-document.write("        // collapse nav\n");
-document.write("        $(document).on('click', 'nav a', function (e) {\n");
-document.write("          var $this = $(e.target), $active;\n");
-document.write("          $this.is('a') || ($this = $this.closest('a'));\n");
-document.write("          \n");
-document.write("          $active = $this.parent().siblings( "+'".active"'+" );");
-document.write("          $active && $active.toggleClass('active').find('> ul:visible').slideUp(200);\n");
-document.write("          \n");
-document.write("          ($this.parent().hasClass('active') && $this.next().slideUp(200)) || $this.next().slideDown(200);\n");
-document.write("          $this.parent().toggleClass('active');\n");
-document.write("          \n");
-document.write("          $this.next().is('ul') && e.preventDefault();\n");
-document.write("\n");
-document.write("          setTimeout(function(){ $(document).trigger('updateNav'); }, 300);      \n");
-document.write("        });\n");
-document.write("      });\n");
-document.write("    }(jQuery);\n");
+$j("<div></div>").load("tail.html",function(){
+	document.write(this.innerHTML.match(/<xmp>([\s\S]*?)<\/xmp>/)[1]);
+	IsReady=2;
+});
 
-document.write("  </script>");
+$j.ajaxSetup({ async: true });
+
++function ($j) {
+  $j(function(){
+	// class
+	$j(document).on('click', '[data-toggle^="class"]', function(e){
+	  e && e.preventDefault();
+	  var $this = $j(e.target), $class , $target, $tmp, $classes, $targets;
+	  !$this.data('toggle') && ($this = $this.closest('[data-toggle^="class"]'));
+	  $class = $this.data()['toggle'];
+	  $target = $this.data('target') || $this.attr('href');
+	  $class && ($tmp = $class.split(':')[1]) && ($classes = $tmp.split(','));
+	  $target && ($targets = $target.split(','));
+	  $classes && $classes.length && $j.each($targets, function( index, value ) {
+		if ( $classes[index].indexOf( '*' ) !== -1 ) {
+		  var patt = new RegExp( '\\s' + 
+			  $classes[index].
+				replace( /\*/g, '[A-Za-z0-9-_]+' ).
+				split( ' ' ).
+				join( '\\s|\\s' ) + 
+			  '\\s', 'g' );
+		  $j($this).each( function ( i, it ) {
+			var cn = ' ' + it.className + ' ';
+			while ( patt.test( cn ) ) {
+			  cn = cn.replace( patt, ' ' );
+			}
+			it.className = $j.trim( cn );
+		  });
+		}
+		($targets[index] !='#') && $j($targets[index]).toggleClass($classes[index]) || $this.toggleClass($classes[index]);
+	  });
+	  $this.toggleClass('active');
+	});
+
+	// collapse nav
+	$j(document).on('click', 'nav a', function (e) {
+	  var $this = $j(e.target), $active;
+	  $this.is('a') || ($this = $this.closest('a'));
+	  
+	  $active = $this.parent().siblings( ".active" );
+	  $active && $active.toggleClass('active').find('> ul:visible').slideUp(200);
+	  
+	  ($this.parent().hasClass('active') && $this.next().slideUp(200)) || $this.next().slideDown(200);
+	  $this.parent().toggleClass('active');
+	  
+	  $this.next().is('ul') && e.preventDefault();
+
+	  setTimeout(function(){ $j(document).trigger('updateNav'); }, 300);      
+	});
+  });
+}(jQuery);
+
 document.write('</body>');
 document.write('</html>');
 	

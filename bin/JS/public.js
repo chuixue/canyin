@@ -15,6 +15,11 @@ function setCookie(name,value)
     exp.setTime(exp.getTime() + Days*24*60*60*1000);
     document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
 }
+function delCookie(name){//为了删除指定名称的cookie，可以将其过期时间设定为一个过去的时间 
+	var date=new Date();
+    date.setTime(date.getTime()-10000);
+    document.cookie=name+"=; expire="+date.toGMTString()+"; path=/";
+} 
 //读取cookies
 function getCookie(name)
 {
@@ -49,6 +54,7 @@ function EnterPress(e){ //传入 event
 	if(e.keyCode == 13)return true;
 	return false;
 }
+
 //用于调试
 function out(obj){
 　　var ob=eval(obj);
@@ -56,6 +62,7 @@ function out(obj){
 　　for(var p in ob)property+=p+ ": " + obj[p] + "\n";
 　　alert(property);
 }
+//*/
 //判断上传文件格式是否满足条件
 function isPicture(fileName){
 	if(fileName!=null && fileName !=""){
@@ -128,7 +135,8 @@ function getConfig2(){
 	var webPORT="8000";
 	var webURL=srvURL + ":" + webPORT;
 	var ajaxURL=srvURL + ":" + ajaxPORT;
-	
+	var socketURL=srvURL + ":" + socketPORT;
+		
 	var cfg={
 		srvURL: srvURL,
 		srvIP: srvIP,
@@ -136,7 +144,8 @@ function getConfig2(){
 		socketPORT: socketPORT,
 		webPORT: webPORT,
 		webURL: webURL,
-		ajaxURL: ajaxURL
+		ajaxURL: ajaxURL,
+		socketURL:socketURL
 	};
 	
 	return cfg;
@@ -152,7 +161,8 @@ function getConfig(){
 	var webPORT="8000";
 	var webURL=srvURL + ":" + webPORT;
 	var ajaxURL=srvURL + ":" + ajaxPORT;
-	
+	var socketURL=srvURL + ":" + socketPORT;
+		
 	var cfg={
 		srvURL: srvURL,
 		srvIP: srvIP,
@@ -160,10 +170,44 @@ function getConfig(){
 		socketPORT: socketPORT,
 		webPORT: webPORT,
 		webURL: webURL,
-		ajaxURL: ajaxURL
+		ajaxURL: ajaxURL,
+		socketURL:socketURL
 	};
 	
 	return cfg;
+}
+//时间日期格式化
+function dateFormat(date, fstr) {
+	var utc="get";
+	return fstr.replace (/%[YmdHMS]/g, function (m) {
+	    switch (m) {
+	    case '%Y': return date[utc + 'FullYear'] (); // no leading zeros required
+	    case '%m': m = 1 + date[utc + 'Month'] (); break;
+	    case '%d': m = date[utc + 'Date'] (); break;
+	    case '%H': m = date[utc + 'Hours'] (); break;
+	    case '%M': m = date[utc + 'Minutes'] (); break;
+	    case '%S': m = date[utc + 'Seconds'] (); break;
+	    default: return m.slice (1); // unknown code, remove %
+	}
+	// add leading zero if required
+	return ('0' + m).slice (-2);
+	});  
+}  
+//获取日期
+function getDateNow(){   
+	return dateFormat(new Date(),"%Y-%m-%d %H:%M:%S");
+}
+//带时区时间
+function toTimeString(time){
+	time=time.replace("T"," ");
+	time=time.split(".")[0];
+	time=time.split("Z")[0];	
+	return time;
+}
+function getTimeMorning(){
+	var now= new Date();
+	now.setHours(4,0,0,0);
+	return now;
 }
 function getTimeNow(){
 	var now= new Date();

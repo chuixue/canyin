@@ -1,53 +1,111 @@
 <script src="head.js"></script>
 <meta charset="utf-8" />
-   <script type="text/javascript" src="myjs/jquery-1.3.2.js"></script>
-   <script type="text/javascript" src="myjs/nav.js"></script>
-   <script type="text/javascript" src="myjs/jquery-1.8.3.min.js"></script>
-   <script type="text/javascript" src="myjs/book.js"></script>
-   <script type="text/javascript" src="myjs/order.js"></script>
-   <script type="text/javascript" src="myjs/vip.js"></script>
-   <link href="chart.css" rel="stylesheet">
- <div class="chart"> 
-   <div id="dish_chart" style="height:500px"></div>
+    
+   <script type="text/javascript" src="datepicker/WdatePicker.js"></script>
+    <script src="jquery.js"></script>
+  
+  <script src="jquery-ui.js"></script>
+    
+   <link href="jquery-ui.css" rel="stylesheet">
+    
+   
+    <script>
+	var $j=$.noConflict();
+
+  $j(function() {
+    $j( "#tabs" ).tabs();
+  });
+  $j(function() {
+    $j( "#datepicker" ).datepicker();
+  });
+  </script>
+   <script>
+function pickedFunc(){
+$dp.$('d523_y').value=$dp.cal.getP('y');
+$dp.$('d523_M').value=$dp.cal.getP('M');
+ 
+}
+function pickedFunc1(){
+$dp.$('d524_y').value=$dp.cal.getP('y');
+}
+</script>
+  <style type="text/css">
+   #tabs{width:60%;margin:0 auto;   } 
+   #tabs ul li{float:left;list-style-type:none;margin-right:2px;}    
+   .chart{ width:100%;margin:0 auto;}   
+   .chart2{ width:100%;margin:0 auto;}
+   .chart3{ width:100%;margin:0 auto;}
+  </style>
+  <div id="tabs">
+  <ul>
+    <li><a href="#tabs-1">每日销量</a></li>
+    <li><a href="#tabs-2">每月销量</a></li>
+    <li><a href="#tabs-3">每年销量</a></li>
+	<li><a href="#tabs-4">季度销量</a></li>
+	<li onclick="data_all()"><a href="#tabs-5">全部销量</a></li>
+	<li><a href="#tabs-6">自定义型</a></li>
+  </ul>
+  <div id="tabs-1" >
+    <p>日期：<input type="text" id="5421"   onFocus="WdatePicker({onpicking:function (dp){   var e1=dp.cal.getNewDateStr();   data_day(e1);  }})" class="Wdate"  > </p>
+	<div class="chart"> 
+   <div id="dish_chart" style="height:500px">  </div>
      <script src="echarts/dist/echarts.js"></script>
-	 <script src="echarts/dist/echarts-all.js"></script>
-     
+	 <script src="echarts/dist/echarts-all.js"></script> 
     <script type="text/javascript">
-        // 路径配置
+	function data_day(x){
+	   var arr1=[];//横坐标数据
+	   var arr2=[];//纵坐标数据
+	    
+	    
+	   var dataArr=new Array();	  
+	    $.ajax({		
+		url: 'http://cins.swpu.edu.cn:8003/sql',  //跨域请求请加域名前缀：http://cins.swpu.edu.cn:8003
+		dataType: "jsonp",	 
+		data: {sql: "select orderinfo.did,sum(orderinfo.ocount) as all_count,dish.dname from orderinfo  inner join dish on orderinfo.did= dish.did where obtime like  '"+x.toString()+"%' group by did"},    //附加数据请用json表示
+		type: 'post',
+		async:false,
+		jsonpCallback: 'callback', 
+		success:function (data){
+ 	  			  
+			for(var i=0;i<data.length;i++){
+				   arr1[i]=data[i].dname;
+				   arr2[i]=data[i].all_count;
+			}
+			  dataArr.push(arr1);
+	          dataArr.push(arr2);
+	      
+		  // 路径配置
         require.config({
             paths: {
                 echarts:'echarts/dist'  
             }
-        });
-        
+        });        
         // 使用
         require(
             [
                 'echarts',
-                'echarts/chart/line' //  折线图
+                'echarts/chart/bar' //  折线图
             ],
             function (ec) {
                 // 基于准备好的dom，初始化echarts图表
                 var myChart = ec.init(document.getElementById('dish_chart')); 
               var  option = {
 			  title : {
-                       text: '菜品每月被点次数',
- 
+                       text: '各种菜品销量', 
                    },
     tooltip : {
         trigger: 'axis'
     },
     legend: {
-        data:['小炒肉1','小炒肉2','小炒肉3','小炒肉4','小炒肉5']
-    },
-     
+        data: ['菜品销量']  //用于设置图例，data内的字符串数组需要与sereis数组内每一个series的name值对应；
+    },     
     calculable : true,
     xAxis : [
         {
             type : 'category',
-            boundaryGap : false,
-            data :["1月份","2月份","3月份","4月份","5月份","6月份",
-							        "7月份","8月份","9月份","10月份","11月份","12月份"]
+            
+            data :dataArr[0]   //横坐标数据，用于设置x轴的刻度，类型为字符串数组
+							        
         }
     ],
     yAxis : [
@@ -57,46 +115,424 @@
     ],
     series : [
         {
-            name:'小炒肉1',
-            type:'line',
+            name:'菜品销量',
+            type:'bar',
             stack: '总量',
-            data:[120, 132, 101, 134, 90, 230, 210, 101, 134, 90, 230, 210]
+            data:dataArr[1] //纵坐标数据，用于设置图表数据之用。series是一个对象嵌套的结构；对象内包含对象；
         },
-        {
-            name:'小炒肉2',
-            type:'line',
-            stack: '总量',
-            data:[220, 182, 191, 234, 290, 330, 310, 191, 234, 290, 330, 310]
-        },
-        {
-            name:'小炒肉3',
-            type:'line',
-            stack: '总量',
-            data:[150, 232, 201, 154, 190, 330, 410, 201, 154, 190, 330, 410]
-        },
-        {
-            name:'小炒肉4',
-            type:'line',
-            stack: '总量',
-            data:[320, 332, 301, 334, 390, 330, 320, 301, 334, 390, 330, 320]
-        },
-        {
-            name:'小炒肉5',
-            type:'line',
-            stack: '总量',
-            data:[820, 932, 901, 934, 1290, 1330, 1320, 901, 934, 1290, 1330, 1320]
-        }
+         
+         
+         
     ]
-};
-                    
-                 
-        
+};                                   
                 // 为echarts对象加载数据 
                 myChart.setOption(option); 
             }
         );
-    </script>  
+		  
+		  
+			 
+			 }
+								 
+   });	          	           
+		}
+    </script> 
 	</div>
-
-
+	
+	
+  </div>
+  <div id="tabs-2" >
+   <p> 月份：<input type="text" id="d523_y" size="5"/> 年
+      <input type="text" id="d523_M" size="3"/> 月
+	   <input type="text" id="d523" size="1" style="display:none"/>
+	  <img onclick="WdatePicker({el:'d523',dateFmt:'yyyy-MM', onpicking:  function(dp){    var e1=dp.cal.getP('y'); var e2=dp.cal.getP('M');  data_month(e1,e2); pickedFunc(); } , })" src="datepicker/skin/datePicker.gif" width="16" height="22" align="absmiddle" style="cursor:pointer"/>
+   </p> 
+     <div class="chart2">
+	  <div id="dish_chart1" style="height:500px">  </div>
+	  <script src="echarts/dist/echarts.js"></script>
+	 <script src="echarts/dist/echarts-all.js"></script>
+<script type="text/javascript">
+	function data_month(x,y){
+	
+		//alert("select orderinfo.did,sum(orderinfo.ocount) as all_count,dish.dname from orderinfo inner join dish on orderinfo.did= dish.did where obtime like  '2015-0"+y.toString()+"%' group by did ");
+	   var arr1=[];//横坐标数据
+	   var arr2=[];//纵坐标数据	    	    
+	   var dataArr=new Array();	  
+	    $.ajax({		
+		url: 'http://cins.swpu.edu.cn:8003/sql',  //跨域请求请加域名前缀：http://cins.swpu.edu.cn:8003
+		dataType: "jsonp",	 
+		data: {sql: "select orderinfo.did,sum(orderinfo.ocount) as all_count,dish.dname from orderinfo inner join dish on orderinfo.did= dish.did where obtime like  '2015-"+y.toString()+"%' group by did "},    //附加数据请用json表示
+		type: 'post',
+		async:false,
+		jsonpCallback: 'callback', 
+		success:function (data){
+ 	  			   
+			for(var i=0;i<data.length;i++){
+				   arr1[i]=data[i].dname;
+				   arr2[i]=data[i].all_count;
+			}
+			  dataArr.push(arr1);
+	          dataArr.push(arr2);
+	      
+		  // 路径配置
+        require.config({
+            paths: {
+                echarts:'echarts/dist'  
+            }
+        });        
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/bar' //  折线图
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                var myChart = ec.init(document.getElementById('dish_chart1')); 
+              var  option = {
+			  title : {
+                       text: '各种菜品销量', 
+                   },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['菜品销量']  //用于设置图例，data内的字符串数组需要与sereis数组内每一个series的name值对应；
+    },     
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            
+            data :dataArr[0]   //横坐标数据，用于设置x轴的刻度，类型为字符串数组
+							        
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'菜品销量',
+            type:'bar',
+            stack: '总量',
+            data:dataArr[1] //纵坐标数据，用于设置图表数据之用。series是一个对象嵌套的结构；对象内包含对象；
+        },
+         
+         
+         
+    ]
+};                                   
+                // 为echarts对象加载数据 
+                myChart.setOption(option); 
+            }
+        );
+		  
+		  
+			 
+			 }
+								 
+   });	          	           
+		}
+    </script> 	
+	</div>
+   
+  </div>
+  <div id="tabs-3">
+    <p>年份:<input type="text" id="d524_y" size="5"/> 年
+	        <input type="text" id="d524" size="1" style="display:none"/>
+	        <img onclick="WdatePicker({el:'d524',dateFmt:'yyyy', onpicking:  function(dp){     var e1=dp.cal.getP('y');  data_year(e1); pickedFunc1(); } , })" src="datepicker/skin/datePicker.gif" width="16" height="22" align="absmiddle" style="cursor:pointer"/>
+	</p>
+	<div class="chart3">
+	  <div id="dish_chart2" style="height:500px">  </div>
+	  <script src="echarts/dist/echarts.js"></script>
+	 <script src="echarts/dist/echarts-all.js"></script>
+<script type="text/javascript">
+	function data_year(x){
+	
+		//alert("select orderinfo.did,sum(orderinfo.ocount) as all_count,dish.dname from orderinfo inner join dish on orderinfo.did= dish.did where obtime like  '2015-0"+y.toString()+"%' group by did ");
+	   var arr1=[];//横坐标数据
+	   var arr2=[];//纵坐标数据	    	    
+	   var dataArr=new Array();	  
+	    $.ajax({		
+		url: 'http://cins.swpu.edu.cn:8003/sql',  //跨域请求请加域名前缀：http://cins.swpu.edu.cn:8003
+		dataType: "jsonp",	 
+		data: {sql: "select orderinfo.did,sum(orderinfo.ocount) as all_count,dish.dname from orderinfo inner join dish on orderinfo.did= dish.did where obtime like  '"+x.toString()+"%' group by did "},    //附加数据请用json表示
+		type: 'post',
+		async:false,
+		jsonpCallback: 'callback', 
+		success:function (data){
+ 	  			   
+			for(var i=0;i<data.length;i++){
+				   arr1[i]=data[i].dname;
+				   arr2[i]=data[i].all_count;
+			}
+			  dataArr.push(arr1);
+	          dataArr.push(arr2);
+	      
+		  // 路径配置
+        require.config({
+            paths: {
+                echarts:'echarts/dist'  
+            }
+        });        
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/bar' //  折线图
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                var myChart = ec.init(document.getElementById('dish_chart2')); 
+              var  option = {
+			  title : {
+                       text: '各种菜品销量', 
+                   },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['菜品销量']  //用于设置图例，data内的字符串数组需要与sereis数组内每一个series的name值对应；
+    },     
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            
+            data :dataArr[0]   //横坐标数据，用于设置x轴的刻度，类型为字符串数组
+							        
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'菜品销量',
+            type:'bar',
+            stack: '总量',
+            data:dataArr[1] //纵坐标数据，用于设置图表数据之用。series是一个对象嵌套的结构；对象内包含对象；
+        },
+         
+         
+         
+    ]
+};                                   
+                // 为echarts对象加载数据 
+                myChart.setOption(option); 
+            }
+        );
+		  
+		  
+			 
+			 }
+								 
+   });	          	           
+		}
+    </script> 	
+	</div>
+	
+   </div>
+   <div id="tabs-4">
+    <p>季度：</p>
+   </div>
+   <div id="tabs-5"  >
+    <p >所有菜的总销量如下图</p>
+	<div class="chart5" >
+	<div id="dish_chart4" style="height:500px">  </div>
+	  <script src="echarts/dist/echarts.js"></script>
+	 <script src="echarts/dist/echarts-all.js"></script>
+	
+	<script type="text/javascript">
+	function data_all(){
+	   var arr1=[];//横坐标数据
+	   var arr2=[];//纵坐标数据
+	    
+	    
+	   var dataArr=new Array();	  
+	    $.ajax({		
+		url: 'http://cins.swpu.edu.cn:8003/sql',  //跨域请求请加域名前缀：http://cins.swpu.edu.cn:8003
+		dataType: "jsonp",	 
+		data: {sql: "select orderinfo.did,sum(orderinfo.ocount) as all_count,dish.dname from orderinfo inner join dish on orderinfo.did=dish.did group by did"},    //附加数据请用json表示
+		type: 'post',
+		async:false,
+		jsonpCallback: 'callback', 
+		success:function (data){
+ 	  			  
+			for(var i=0;i<data.length;i++){
+				   arr1[i]=data[i].dname;
+				   arr2[i]=data[i].all_count;
+			}
+			  dataArr.push(arr1);
+	          dataArr.push(arr2);
+	      
+		  // 路径配置
+        require.config({
+            paths: {
+                echarts:'echarts/dist'  
+            }
+        });        
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/bar' //  折线图
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                var myChart = ec.init(document.getElementById('dish_chart4')); 
+              var  option = {
+			  title : {
+                       text: '各种菜品销量', 
+                   },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['菜品销量']  //用于设置图例，data内的字符串数组需要与sereis数组内每一个series的name值对应；
+    },     
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            
+            data :dataArr[0]   //横坐标数据，用于设置x轴的刻度，类型为字符串数组
+							        
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'菜品销量',
+            type:'bar',
+            stack: '总量',
+            data:dataArr[1] //纵坐标数据，用于设置图表数据之用。series是一个对象嵌套的结构；对象内包含对象；
+        },
+         
+         
+         
+    ]
+};                                   
+                // 为echarts对象加载数据 
+                myChart.setOption(option); 
+            }
+        );
+		  
+		  
+			 
+			 }
+								 
+   });	          	           
+		}
+    </script>
+	</div>
+   </div>
+   <div id="tabs-6">
+    <p>日期从：<input id="first" onFocus="var second=$dp.$('second');WdatePicker({onpicked:function(dp){ var e1=dp.cal.getDateStr(); second.focus();},maxDate:'#F{$dp.$D(\'second\')}'})"> 
+	       至：<input id="second" onFocus="WdatePicker({ onpicked:function(dp){var e2=dp.cal.getNewDateStr();  data_defined(e1,e2);},   minDate:'#F{$dp.$D(\'first\')}'})"> </p>
+		   
+	<div class="chart5">
+	  <div id="dish_chart5" style="height:500px">  </div>
+	  <script src="echarts/dist/echarts.js"></script>
+	 <script src="echarts/dist/echarts-all.js"></script>
+<script type="text/javascript">
+	function data_defined(x,y){			 
+	   var arr1=[];//横坐标数据
+	   var arr2=[];//纵坐标数据	    	    
+	   var dataArr=new Array();	  
+	    $.ajax({		
+		url: 'http://cins.swpu.edu.cn:8003/sql',  //跨域请求请加域名前缀：http://cins.swpu.edu.cn:8003
+		dataType: "jsonp",	 
+		data: {sql: "select orderinfo.did,sum(orderinfo.ocount) as all_count,dish.dname from orderinfo inner join dish on orderinfo.did=dish.did where obtime>='"+x.toString()+"%' and  obtime <= '"+y.toString()+"%' group by did"},    //附加数据请用json表示
+		type: 'post',
+		async:false,
+		jsonpCallback: 'callback', 
+		success:function (data){
+ 	  			   
+			for(var i=0;i<data.length;i++){
+				   arr1[i]=data[i].dname;
+				   arr2[i]=data[i].all_count;
+			}
+			  dataArr.push(arr1);
+	          dataArr.push(arr2);
+	      
+		  // 路径配置
+        require.config({
+            paths: {
+                echarts:'echarts/dist'  
+            }
+        });        
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/bar' //  折线图
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                var myChart = ec.init(document.getElementById('dish_chart5')); 
+              var  option = {
+			  title : {
+                       text: '各种菜品销量', 
+                   },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['菜品销量']  //用于设置图例，data内的字符串数组需要与sereis数组内每一个series的name值对应；
+    },     
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            
+            data :dataArr[0]   //横坐标数据，用于设置x轴的刻度，类型为字符串数组
+							        
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'菜品销量',
+            type:'bar',
+            stack: '总量',
+            data:dataArr[1] //纵坐标数据，用于设置图表数据之用。series是一个对象嵌套的结构；对象内包含对象；
+        },
+         
+         
+         
+    ]
+};                                   
+                // 为echarts对象加载数据 
+                myChart.setOption(option); 
+            }
+        );
+		  
+		  
+			 
+			 }
+								 
+   });	          	           
+		}
+    </script> 	
+	</div>	   
+		   
+   </div>
+</div>
+	
+	
+	
 <script src="tail.js"></script>

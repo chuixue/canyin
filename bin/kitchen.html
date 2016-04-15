@@ -1,14 +1,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="JS/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="JS/public.js"></script>
 <script  type="text/javascript" src="head.js"></script>
-<script type="text/javascript" src="JS/jquery-1.9.1.js"></script>
-
 <script type="text/javascript" src="JS/ejs/ejs.js"></script>
 <script type="text/javascript" src="JS/json2.js"></script>
-<script type="text/javascript" src="JS/public.js"></script>
 <script type="text/javascript" src="JS/bootstrap.min.js"></script>
 <script type="text/javascript" src="JS/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="JS/order.js"></script>
-
 
 <link rel="stylesheet" href="Css/public.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="Css/easyui.css" /> 
@@ -16,25 +14,25 @@
 
 <style type="text/css">
 
-.hls{display:block; line-height:30px; padding:1px 10px 1px 10px; text-decoration: none;}
-.hl{display:block; line-height:30px; padding:1px 10px 1px 10px; cursor:pointer; text-decoration: none;}
-.hl:hover{background:#CCA;;}
+._hl{cursor:pointer; }
+._hls{ display:block;text-decoration: none; line-height:30px; padding:10px 10px 5px 10px;word-break:keep-all;font:15px "Times New Roman", Times, serif  }
+.fcolor{ color:#990}
 .pdTop1{ padding-top:5px }
 .bdt{ border-left:1px solid #CCC;border-top:1px solid #CCC;border-right:1px solid #CCC; }	/*边框·上*/
 .bdb{ border-left:1px solid #CCC;border-bottom:1px solid #CCC;border-right:1px solid #CCC;}	/*边框·下*/
 .bdTop{ border-top:1px solid #CCC; }
-.bdr{ border-right:0px solid #CCC; }	/*边框·右*/
+.bdr{ border-right:0px solid #CCC;  }	/*边框·右*/
 .w50{ width:50px}	
 .nbdb{ border-bottom:0px; }	/*无边框·上*/
-.hlr{ margin-left:100px;width:auto;overflow:hidden;zoom:1; border-left:1px solid #ccc; }   /*右边分类总div*/
-#panel1{ height:auto; border:0px solid #0F9; min-height:200px }
-#panel2{ height:auto; border:0px solid #0F9; min-height:600px }
+._hlr{ margin-left:100px;width:auto;overflow:hidden;zoom:1; border-left:1px solid #ccc; }   /*右边分类总div*/
+#panel1{ height:auto; border:0px solid #0F9; min-height:200px;  }
+#panel2{ height:auto; border:0px solid #0F9; min-height:600px; }
 #panel{ min-height:400px;}
 .panelx{ height:auto;border:0px solid #0F9; float:left; min-height:150px; min-width:400px; width:100%};
 
-
-._btn1{ width:60%; margin-left:3px;margin-top:5px; margin-bottom:5px;margin-bottom:5px;}
-._btn2{ width:60%; margin-left:3px;margin-top:5px; margin-bottom:5px;margin-bottom:5px;}
+._btn{ width:60%; margin-left:3px;margin-top:10px; margin-bottom:10px; height:25px; line-height:30px}
+._btn2{ margin:10px 1px 10px 5px; height:25px; color:red; cursor:pointer;letter-spacing:2px; font-weight:bold;line-height:25px;font:#066;border:1px solid #ccc;display:inline-block;}
+._btn2:hover{ background-color:#09F}
 .bd1{ border:1px solid #CCF}
 .sDiv{ float:right; margin-right:16px}
 .reject{width:20px; padding:0px; margin:5px 1px 5px 5px;border:0px};
@@ -43,40 +41,57 @@ table{ height:auto;     }
 .panel-icons{ background-color:#FFF; background:url('#')}
 .icon-edits{ background:url('#')}
 .btn_tb{ height:23px; width:80px; line-height:20px; padding-top:1px; margin-left:15px; margin-right:15px}
+.tbcls{ padding:10px 2px 5px 15px;font:"Times New Roman", Times, serif}
+.ico_name{color:green; font-weight:600; margin-right:15px }
+.ico_font{color:red; font-weight:600; margin-right:15px }
+
 #tListAll .datagrid-btable tr{height: 400px;}
+
 </style>
 
-<div id="" class="allW" style="min-height:200px; margin-top:10px; padding:15px">
-    <div class="bdt clear">
-        <div class="floatL hl w50">综合</div>
-        <div class="floatL hls w50">分类</div>
-        <div class="hlr" id="headline1">
-                
+<div id="cc" class="easyui-layout allW" style="min-height:700px; margin-top:10px;left:10px; padding-left:20px;padding-right:20px">   
+    <!----框架上---->
+    <div data-options="region:'north',title:'导航',split:true" style="height:100px;">
+        <div class="bdt clear">
+            <div class="floatL _hl _hls w50">综合</div>
+            <div class="floatL _hls w50">分类</div>
+            <div class="_hlr" id="headline1">
+                    
+            </div>
         </div>
-    </div>
-    <div class="clear bdb">
-        <div class="floatL hl w50">预览</div>
-        <div class="floatL hls w50">人员</div>
-        <div class="hlr bdTop" id="headline2">
-                <div class="floatL hl bdr">分类1</div>
+        <div class="clear bdb">
+            <div class="floatL _hl _hls w50">预览</div>
+            <div class="floatL _hls w50">人员</div>
+            <div class="_hlr bdTop" id="headline2">
+                    <div class="floatL _hls _hl bdr green" onmouseover="clc(this,0)" onmouseout="clc(this,1)" >分类1</div>
+            </div>
         </div>
-    </div>
-    <div class="allW clear" id="panel"><!--****************外框********************-->
-        <div class="w5 floatL" id="panel1">
+    </div>   
+    <!----框架左---->
+    <div data-options="region:'west',title:'分类订单',split:true" style="width:400px;">
+    	<div id="panel1">
+        
+		</div>
+    
+    
+    </div>   
+    <!----框架右---->    
+    <div data-options="region:'center',title:'全部订单'" style="padding:5px;background:#eee;min-height:500px;background-color:white; padding:1px">
+	    <div id="panel2">
         
         </div>
-        <div class="w5 floatL" id="panel2">
-        
-        </div>
-    </div><!----End·外框------>
-</div>
+    
+    
+    
+    </div>   
+</div>  
 
 <!-----------------------组件--------------------------->
 <div class="hide" id="divHide">
 	<div id="listAll">
-        <table id="tListAll">
+        <table id="tListAll" parentId="panel2">
             <div id="tb">
-            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-removes',plain:true" onClick="javascripts:saveall();" ></a>
+            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon_remove_',plain:true" onClick="javascripts:saveall();" ></a>
             <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onClick="javascripts:loadDataAll(tListAll);" ></a>
             <div class="sDiv"><input id="search_names" title="tListAll" class="easyui-searchbox" searcher="doSearch" prompt="请输入搜索内容" style="width:130px" /></div>
             </div>
@@ -93,12 +108,18 @@ table{ height:auto;     }
 <script id="tm_tb" type="text/template">
 	<% var listId=id %>
 	<div class="panelx" id="dv<%= listId %>">
-		<table id="tList<%= listId %>"></table>
-		<div style="width:100%;height:30px;border:1px solid #ccc;line-height:25px">
-			<button type="button" class="btn btn-default btn_tb floatL" onclick="javascripts:refreshGrid('<%= listId %>')">刷新</button>
-			<label id="tbRst<%= listId %>" class="floatL red"></label>
-			<button type="button" class="btn btn-default btn_tb floatR" onclick="javascripts:gridPrint('<%= listId %>')">打印</button>			
-			<button type="button" class="btn btn-default btn_tb floatR" onclick="javascripts:removePrint('<%= listId %>')" title="过滤已打印清单">过滤</button>
+		<table id="tList<%= listId %>" parentId="panel1">
+			<div id="tb_<%= listId %>" class="tbcls">
+				<a id="cls_name_<%= listId %>" class="ico_name" href="#" ></a>  
+				<a id="cls_reload_<%= listId %>" class="ico_font" onclick="javascripts:refreshGrid('<%= listId %>')" title="加载全部未完成清单">刷新</a>  
+				<a id="cls_print_<%= listId %>" class="ico_font" onclick="javascripts:gridPrint('<%= listId %>')" title="打印未打印的清单">打印</a>  
+				<a id="cls_filter_<%= listId %>" class="ico_font" href="#" onclick="javascripts:removePrint('<%= listId %>')" title="过滤已打印清单">过滤</a>  
+					
+			</div>
+		</table>
+
+		<div style="width:100%;height:30px;border:1px solid #ccc;line-height:25px; background:#F0F0F0">
+			<span class="floatL">状态：</span><span id="tbRst<%= listId %>" class="floatL red"></span>
 		</div>
 	</div>
 </script>
@@ -133,7 +154,6 @@ table{ height:auto;     }
 </script>
 
 <script language="javascript">
-	var $j=$.noConflict();
 	var PUB_cfg=getConfig();
 	var PUB_user=getUser();	
 	var cache_shopId=PUB_user.shop;
@@ -143,18 +163,81 @@ table{ height:auto;     }
 	var cahce_person_data={};//分类数据
 	var cache_class={};
 	var cache_person={};	
-	panel2.innerHTML=listAll.innerHTML;
-	divHide.innerHTML="";
-	beforeLoad();
-	loadMainGrid(tListAll);
+	$j(function(){
+		$j(panel2).html(listAll.innerHTML);
+		divHide.innerHTML="";//return;
+		beforeLoad();
+		loadMainGrid(tListAll);
+		
+	})
+	function clc(obj,style){
+		if(style==0)obj.style.backgroundColor="#CCC";
+		else obj.style.backgroundColor="white";		
+	}
+	//设置子窗体样式· 网格效果·全局
+	function SetClassStyle(){
+		var tr = $j('table.datagrid-btable').find('tr');  // out(tr); return;
+		tr.each(function(){  
+            var td = $j(this).children(); 
+			td.each(function(){
+				$j(this).css({   
+					"border-bottom": "dotted 1px #ccc","border-left": "none","border-right": "none"
+				});   		
+			});
+		});
+	}
+	function GridResize(listId){
+		$j("#panel2").resize(function(){
+			//var parent=$j(listId).attr("parentId");
+			//var width=parseFloat($$(parent).offsetWidth);
+
+			//var cols=getOrderColumns(listId);
+			//$j(listId).datagrid({ columns:cols });
+		//loadDataGrid(tListAll);
+		//$j(listId).datagrid({toolbar: '#tb'});
+		//showColumns(tListAll,["numb","dish","desk","count","state","date","cancel","action"])
+		
+		
+		//$j(tListAll).datagrid('loadData',__ListData);
+		//addCancel(tListAll,"2");
+		//loadGrid(-1);
+		//SetClassStyle();
+					
+			//alert(3);
+		});
+	}
 	//加载总表
 	function loadMainGrid(listId){
 		loadDataGrid(tListAll);
-		$j(listId).datagrid({title:'全部订单'}); 
 		$j(listId).datagrid({toolbar: '#tb'});
 		showColumns(tListAll,["numb","dish","desk","count","state","date","cancel","action"])
 		loadDataAll(listId);
-		window.onresize = function(){	setTimeout(function(){resizeGrid(listId);},300);};
+		
+		GridResize(listId);
+		//伸缩事件
+
+/*
+		$j("#panel2").resize(function(){
+			var parent=$j(listId).attr("parentId");
+			var width=parseFloat($$(parent).offsetWidth);
+
+			var cols=getOrderColumns(listId);
+			$j(listId).datagrid({ columns:cols });
+			
+			alert(3);
+			//alert(width);
+			//$j(listId).datagrid('resize', {
+				
+//				$j(listId).datagrid({ columns:cols});
+				//width:function(){return 100;},
+				//height:function(){return document.body.clientHeight;},
+			//});
+			//alert(3);
+		});
+	*/	
+//		alert(listId.id);
+		//window.onresize = function(){	setTimeout(function(){resizeGrid(listId);},300);};
+
 	}
 	function loadDataAll(mainListId){
 		getDataKitchen(cache_shopId,function(data){
@@ -162,6 +245,7 @@ table{ height:auto;     }
 			$j(mainListId).datagrid('loadData',__ListData);
 			addCancel(mainListId,"2");
 			loadGrid(-1);
+			SetClassStyle();
 		});
 	}
 	//处理订单
@@ -193,6 +277,7 @@ table{ height:auto;     }
 		pnl.find("div.datagrid-header td").css("border","none");
 		pnl.find("div.datagrid-header").css("border","none");
 		pnl.find("div.datagrid-header-inner").css("backgroundColor","#FFF");	
+
 		
 		$j(listId).datagrid({iconCls:"icon-print"}); 
 	}
@@ -289,11 +374,13 @@ table{ height:auto;     }
 		var txt="";
 		if(style==-1){
 			for(var v in cahce_class_data){
-				txt+=getClassGridHtml(v);
+//				txt+=getClassGridHtml(v);
+				$j(panel1).append(getClassGridHtml(v));
 				dataAll["tList" + v]=cahce_class_data[v];
 			}
 			for(var v in cahce_person_data){
-				txt+=getClassGridHtml(v);
+				//txt+=getClassGridHtml(v);
+				$j(panel1).append(getClassGridHtml(v));
 				dataAll["tList" + v]=cahce_person_data[v];
 			}
 		}else{
@@ -305,20 +392,29 @@ table{ height:auto;     }
 				txt+=getClassGridHtml(v);
 			}
 		}
-		panel1.innerHTML=txt;
+//		$j(panel1).html(txt);
 		for(var v in dataAll){
 			var name=v.substr(8);
-			loadDataGrid($$(v));
-			$j($$(v)).datagrid({title:"分类清单： " + cache_class[name]}); 
+			loadDataGrid($$(v),1);
+
+			//$j($$(v)).datagrid({title:"分类清单： " + cache_class[name]}); 
 			showColumns($$(v),["numb","dish","desk","count","state","date"]);
 			setClassStyle($$(v));
+			//工具栏
+			$j("#"+ v).datagrid({toolbar: '#tb_cls' + name});
+			$j("#cls_name_cls"+ name).html(cache_class[name]);
+			$j("#cls_name_cls"+ name).linkbutton({iconCls: 'icon-star',plain:true   });			
+			$j("#cls_print_cls"+ name).linkbutton({iconCls: 'icon-print',plain:true   });			
+			$j("#cls_reload_cls"+ name).linkbutton({iconCls: 'icon-reload',plain:true   });		
+			$j("#cls_filter_cls"+ name).linkbutton({iconCls: 'icon-filter1',plain:true   });		
+									
 			if(dataAll[v])$j($$(v)).datagrid('loadData',dataAll[v]);
 		}
 		for(var e in cache_class){//空表
 			var v="tListcls" + e;
 			if(dataAll[v])continue;
 			if(!$$(v))continue;
-			loadDataGrid($$(v));
+			loadDataGrid($$(v),1);
 			$j($$(v)).datagrid({title:"分类清单： " + cache_class[e]}); 
 			showColumns($$(v),["numb","dish","desk","count","state","date"]);
 			setClassStyle($$(v));
@@ -326,7 +422,7 @@ table{ height:auto;     }
 		for(var e in cache_person){//空表
 			var v="tListpsn" + e;
 			if(dataAll[v])continue;
-			loadDataGrid($$(v));
+			loadDataGrid($$(v),1);
 			$j($$(v)).datagrid({title:"人员清单： " + cache_class[e]}); 
 			showColumns($$(v),["numb","dish","desk","count","state","date"]);
 			setClassStyle($$(v));
@@ -335,7 +431,7 @@ table{ height:auto;     }
 	}
 	
 	//加载分类
-	function beforeLoad(){	//return;
+	function beforeLoad(){	
 		$j.ajax({
 		url: PUB_cfg.ajaxURL + '/dishclass', //PUB_cfg.ajaxURL
 		dataType: "jsonp",	 
@@ -347,8 +443,9 @@ table{ height:auto;     }
 				var data=RST;//RST.dishClass;
 				var txt="";			
 				for(var i=0;i<data.length;i++){
-					txt+='<div class="floatL hl bdr" title="'+ data[i].id +'" onclick="javascripts:loadGrid(0,' + "'cls" + 
-						data[i].id.toString() + "'"+ ');">'+ data[i].name +'</div>';
+					txt+='<div class="floatL green _hl _hls bdr" onmouseover="clc(this,0)" onmouseout="clc(this,1)" clsId="';
+					txt+=data[i].id +'" onclick="javascripts:loadGrid(0,' + "'cls" + data[i].id.toString() ;
+					txt+="'" + ');">'+ data[i].name +'</div>';
 					cache_class[data[i].id]=data[i].name;
 				}	
 				$$("headline1").innerHTML+=txt;

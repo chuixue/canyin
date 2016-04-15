@@ -1,0 +1,534 @@
+<xmp>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Access-Control-Allow-Origin" content="*">
+  <title>先进、智能的餐饮平台和解决方案</title>
+  <meta name="description" content="app, web app, responsive, responsive layout, admin, admin panel, admin dashboard, flat, flat ui, ui kit, AngularJS, ui route, charts, widgets, components" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link rel="stylesheet" href="../css/bootstrap.css" type="text/css" />
+  <link rel="stylesheet" href="../css/animate.css" type="text/css" />
+  <link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css" />
+  <link rel="stylesheet" href="../css/simple-line-icons.css" type="text/css" />
+  <link rel="stylesheet" href="../css/font.css" type="text/css" />
+  <link rel="stylesheet" href="../css/app.css" type="text/css" />
+  <script type="text/javascript" src="JS/socket.io.js"></script>
+</head>
+<body>
+  <div class="app app-header-fixed" id="app" >
+    <!-- navbar -->
+    <div class="app-header navbar" style="border:black">
+      <!-- navbar header -->
+      <div class="navbar-header bg-dark">
+        <button class="pull-right visible-xs dk" data-toggle="class:show" data-target=".navbar-collapse">
+          <i class="glyphicon glyphicon-cog"></i>
+        </button>
+        <button class="pull-right visible-xs" data-toggle="class:off-screen" data-target=".app-aside" ui-scroll="app">
+          <i class="glyphicon glyphicon-align-justify"></i>
+        </button>
+        <!-- brand -->
+        <a href="#/" class="navbar-brand text-lt">
+          <i class="fa fa-flag"></i>
+          <img src="../img/logo.png" alt="." class="hide">
+          <span class="hidden-folded m-l-xs"> &nbsp;&nbsp;CINS</span>
+        </a>
+        <!-- / brand -->
+      </div>
+      <!-- / navbar header -->
+
+      <!-- navbar collapse -->
+      <div class="collapse pos-rlt navbar-collapse box-shadow bg-white-only">
+        <!-- buttons -->
+        <div class="nav navbar-nav hidden-xs">
+          <a href="#" class="btn no-shadow navbar-btn" data-toggle="class:app-aside-folded" data-target=".app">
+            <i class="fa fa-dedent fa-fw text" title="伸缩/扩展"></i>
+            <i class="fa fa-indent fa-fw text-active"></i>
+          </a>
+          <a href class="btn no-shadow navbar-btn">
+            <i class="fa fa-rss fa-fw text" title="通信状态" style="color:#CCC" id="net_sign"></i>
+          </a>
+        </div>
+        <!-- / buttons -->
+
+        <!-- search form -->
+        <form class="navbar-form navbar-form-sm navbar-left shift" ui-shift="prependTo" data-target=".navbar-collapse" role="search" ng-controller="TypeaheadDemoCtrl">
+          <div class="form-group">
+            <div class="input-group">
+              <input type="text" ng-model="selected" typeahead="state for state in states | filter:$viewValue | limitTo:8" class="form-control input-sm bg-light no-border rounded padder" placeholder="Search projects...">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-sm bg-light rounded"><i class="fa fa-search"></i></button>
+              </span>
+            </div>
+          </div>
+        </form>
+        <!-- / search form -->
+
+        <!-- nabar right -->
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown" id="money_icon">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+              <i class="icon-envelope fa-fw" title="付款信息"></i>
+              <span class="badge badge-sm up bg-danger pull-right-xs" id="money_count"></span>
+            </a>
+            <!-- dropdown -->
+            <div class="dropdown-menu w-xl animated fadeInUp">
+              <div class="panel bg-white">
+                <div class="panel-heading b-light bg-light">
+                  <strong>收到 <span id="money_count_small"></span> 条新消息</strong>
+                </div>
+                <div class="list-group">
+                  <a href class="media list-group-item" id="money_content">
+                    <span class="media-body block m-b-none">
+                      <label id="money_text">付款信息</label><br>
+                      <small class="text-muted" id="money_text_small">10 minutes ago</small>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- / dropdown -->
+          </li>   
+          <li class="dropdown" id="bell_icon">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+              <i class="icon-microphone fa-fw" title="呼叫通知"></i>
+              <span class="badge badge-sm up bg-danger pull-right-xs" style="background-color:green" id="bell_count"></span>
+            </a>
+            <!-- dropdown -->
+            <div class="dropdown-menu w-xl animated fadeInUp">
+              <div class="panel bg-white">
+                <div class="panel-heading b-light bg-light">
+                  <strong>收到 <span id="bell_count_small">0</span> 条新通知</strong>
+                </div>
+                <div class="list-group">
+                  <a href class="media list-group-item" id="bell_content">
+                    <span class="media-body block m-b-none">
+                      <label id="bell_text">呼叫信息</label><br>
+                      <small class="text-muted" id="bell_text_small">10 minutes ago</small>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- / dropdown -->
+          </li>
+          <li class="dropdown" id="mail_icon">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+              <i class="icon-bell fa-fw" title="订单消息"></i>
+              <span class="badge badge-sm up bg-danger pull-right-xs" style="background-color:blue" id="mail_count"></span>
+            </a>
+            <!-- dropdown -->
+            <div class="dropdown-menu w-xl animated fadeInUp">
+              <div class="panel bg-white">
+                <div class="panel-heading b-light bg-light">
+                  <strong>收到 <span id="mail_count_small"></span> 条新消息</strong>
+                </div>
+                <div class="list-group">
+                  <a href class="media list-group-item" id="mail_content">
+                    <span class="media-body block m-b-none">
+                      <label id="mail_text">订单信息</label><br>
+                      <small class="text-muted" id="mail_text_small">1 分钟以前</small>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- / dropdown -->
+          </li>                 
+          <li class="dropdown">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle clear" data-toggle="dropdown">
+              <span class="thumb-sm avatar pull-right m-t-n-sm m-b-n-sm m-l-sm">
+                <img src="../img/a0.jpg" alt="...">
+                <i class="on md b-white bottom"></i>
+              </span>
+              <span class="hidden-sm hidden-md" id="user_user">未知</span> <b class="caret"></b>
+            </a>
+            <!-- dropdown -->
+            <ul class="dropdown-menu animated fadeInRight w">
+              <li class="wrapper b-b m-b-sm bg-light m-t-n-xs" style="height:40px">
+                  <span>个人信息</span>
+              </li>
+              <li>
+                <a href>
+                  商家：<span style="padding-left:20px;color:green" id="user_shop">未知</span>
+                </a>
+              </li>
+              <li>
+                <a ui-sref="app.page.profile">
+                	职位：<span style="padding-left:20px;color:green" id="user_power">未知</span>
+                </a>
+              </li>
+              <li>
+                <a ui-sref="app.docs"><span class="pull-right" id="user_time" style=" padding-right:20px">0</span>
+                  登录时常：
+                </a>
+              </li>
+              <li class="divider"></li>
+              <li>
+	            <a ui-sref="access.signin" id="user_loginOut">
+                  <span class="pull-right" id="user_time" style=" padding-right:15px"><i class="fa-pinterest fa fa-fw text"></i></span>
+                  退出
+                </a>
+              </li>
+            </ul>
+            <!-- / dropdown -->
+          </li>
+        </ul>
+        <!-- / navbar right -->
+
+      </div>
+      <!-- / navbar collapse -->
+    </div>
+    <!-- / navbar -->
+
+    <!-- menu **********************************************Menu**************************************-->
+    <div class="app-aside hidden-xs bg-dark">
+      <div class="aside-wrap">
+        <div class="navi-wrap">
+          <!-- user -->
+          
+          <!-- / user -->
+
+          <!-- nav -->
+          <nav ui-nav class="navi">
+            <ul class="nav">
+              <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+                <span translate="aside.nav.HEADER">Navigation</span>
+              </li>
+              <li>
+                <a href class="auto">      
+                  <span class="pull-right text-muted">
+                    <i class="fa fa-fw fa-angle-right text"></i>
+                    <i class="fa fa-fw fa-angle-down text-active"></i>
+                  </span>
+                  <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+                  <span class="font-bold" translate="aside.nav.DASHBOARD">商品</span>
+                </a>
+                <ul class="nav nav-sub dk">
+                  <li class="nav-sub-header">
+                    <a href>
+                      <span translate="aside.nav.DASHBOARD">Dashboard</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.dashboard-v1" href="addClass.html">
+                      <span>添加分类</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.dashboard-v2" href="addDish.html">
+                      <b class="label bg-info pull-right">N</b>
+                      <span>添加菜品</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href class="auto">
+                  <span class="pull-right text-muted">
+                    <i class="fa fa-fw fa-angle-right text"></i>
+                    <i class="fa fa-fw fa-angle-down text-active"></i>
+                  </span>
+                  <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                  <span class="font-bold">服务</span>
+                </a>
+                <ul class="nav nav-sub dk">
+                  <li class="nav-sub-header">
+                    <a href>
+                      <span>服务</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="apps.note" href="getKey.html">
+                      <span>餐桌信息</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="apps.note" href="call.html">
+                      <span>呼叫管理</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li ui-sref-active="active">
+                <a ui-sref="app.mail.list" href="kitchen.html">
+                  <b class="badge bg-info pull-right">9</b>
+                  <i class="glyphicon glyphicon-envelope icon text-info-lter"></i>
+                  <span class="font-bold" translate="aside.nav.EMAIL">后厨</span>
+                </a>
+              </li>
+              <li>
+                <a href class="auto">
+                  <span class="pull-right text-muted">
+                    <i class="fa fa-fw fa-angle-right text"></i>
+                    <i class="fa fa-fw fa-angle-down text-active"></i>
+                  </span>
+                  <i class="glyphicon glyphicon-th-large icon text-success"></i>
+                  <span class="font-bold">结算</span>
+                </a>
+                <ul class="nav nav-sub dk">
+                  <li class="nav-sub-header">
+                    <a href>
+                      <span>结算</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="apps.note" href="balance.html">
+                      <span>订单结算</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href class="auto">
+                  <span class="pull-right text-muted">
+                    <i class="fa fa-fw fa-angle-right text"></i>
+                    <i class="fa fa-fw fa-angle-down text-active"></i>
+                  </span>
+                  <i class="glyphicon glyphicon-lock icon text-success"></i>
+                  <span class="font-bold">设置</span>
+                </a>
+                <ul class="nav nav-sub dk">
+                  <li class="nav-sub-header">
+                    <a href>
+                      <span>设置</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="apps.note" href="view.html">
+                      <span>3D素材</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="apps.note" href="setting.html">
+                      <span>验证设置</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="apps.contact" href="twoCode.html">
+                      <span>二维码</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+
+              <li class="line dk"></li>
+
+              <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+                <span translate="aside.nav.components.COMPONENTS">Components</span>
+              </li>
+              <li>
+                <a href class="auto">      
+                  <span class="pull-right text-muted">
+                    <i class="fa fa-fw fa-angle-right text"></i>
+                    <i class="fa fa-fw fa-angle-down text-active"></i>
+                  </span>
+                  <b class="badge bg-info pull-right">3</b>
+                  <i class="glyphicon glyphicon-th"></i>
+                  <span>预定系统</span>
+                </a>
+                <ul class="nav nav-sub dk">
+                  <li class="nav-sub-header">
+                    <a href>
+                      <span>Layout</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="layout.app" href="../han/today_order.html">
+                      <span>当日预订</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="layout.fullwidth"   href="../han/all_order.html">
+                      <span>历史预定</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li ng-class="{active:$state.includes('app.ui')}">
+                <a href class="auto">
+                  <span class="pull-right text-muted">
+                    <i class="fa fa-fw fa-angle-right text"></i>
+                    <i class="fa fa-fw fa-angle-down text-active"></i>
+                  </span>
+                  <i class="glyphicon glyphicon-briefcase icon"></i>
+                  <span translate="aside.nav.components.ui_kits.UI_KITS">客户管理</span>
+                </a>
+                <ul class="nav nav-sub dk">
+                  <li class="nav-sub-header">
+                    <a href>
+                      <span translate="aside.nav.components.ui_kits.UI_KITS">UI Kits</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.ui.timeline" href="../han/vip.html">
+                      <span translate="aside.nav.components.ui_kits.TIMELINE">会员信息</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li ng-class="{active:$state.includes('app.table')}">
+                <a href class="auto">
+                  <span class="pull-right text-muted">
+                    <i class="fa fa-fw fa-angle-right text"></i>
+                    <i class="fa fa-fw fa-angle-down text-active"></i>
+                  </span>
+                  <b class="label bg-primary pull-right">2</b>
+                  <i class="glyphicon glyphicon-list"></i>
+                  <span translate="aside.nav.components.table.TABLE">数据报表</span>
+                </a>
+                <ul class="nav nav-sub dk">
+                  <li class="nav-sub-header">
+                    <a href>
+                      <span translate="aside.nav.components.table.TABLE">Table</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.table.static" href="../han/consume_chart.html">
+                      <span translate="aside.nav.components.table.TABLE_STATIC">营业额报表</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.table.datatable"  href="../han/dish_chart.html">
+                      <span translate="aside.nav.components.table.DATATABLE">菜品类报表</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.table.footable" href="../han/number_chart.html">
+                      <span translate="aside.nav.components.table.FOOTABLE">用餐人数报表</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li ng-class="{active:$state.includes('app.form' )}">
+                <a href class="auto">
+                  <span class="pull-right text-muted">
+                    <i class="fa fa-fw fa-angle-right text"></i>
+                    <i class="fa fa-fw fa-angle-down text-active"></i>
+                  </span>
+                  <i class="glyphicon glyphicon-edit"></i>
+                  <span translate="aside.nav.components.form.FORM">营销管理</span>
+                </a>
+                <ul class="nav nav-sub dk">
+                  <li class="nav-sub-header">
+                    <a href>
+                      <span translate="aside.nav.components.form.FORM">营销管理</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.form.elements" href="../han/dish.html">
+                      <span translate="aside.nav.components.form.FORM_ELEMENTS">菜品推荐</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.form.elements" href="../han/dish_chart.html">
+                      <span translate="aside.nav.components.form.FORM_ELEMENTS">会员生日策划</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.form.validation" href="../han/number_chart.html">
+                      <span translate="aside.nav.components.form.FORM_VALIDATION">节假日促销</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li ng-class="{active:$state.includes('app.page')}">
+                <a href class="auto">
+                  <span class="pull-right text-muted">
+                    <i class="fa fa-fw fa-angle-right text"></i>
+                    <i class="fa fa-fw fa-angle-down text-active"></i>
+                  </span>
+                  <i class="glyphicon glyphicon-signal"></i>
+                  <span translate="aside.nav.components.pages.PAGES">服务管理</span>
+                </a>
+                <ul class="nav nav-sub dk">
+                  <li class="nav-sub-header">
+                    <a href>
+                      <span translate="aside.nav.components.pages.PAGES">服务管理</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.page.price" href="../han/worker.html">
+                      <span>服务员管理</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li ng-class="{active:$state.includes('app.page')}">
+                <a href class="auto">
+                  <span class="pull-right text-muted">
+                    <i class="fa fa-fw fa-angle-right text"></i>
+                    <i class="fa fa-fw fa-angle-down text-active"></i>
+                  </span>
+                  <i class="glyphicon glyphicon-file icon"></i>
+                  <span translate="aside.nav.components.pages.PAGES">客户反馈</span>
+                </a>
+                <ul class="nav nav-sub dk">
+                  <li class="nav-sub-header">
+                    <a href>
+                      <span translate="aside.nav.components.pages.PAGES">Pages</span>
+                    </a>
+                  </li>
+                  <li ui-sref-active="active">
+                    <a ui-sref="app.page.price">
+                      <span>整体评价</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+
+              <li class="line dk hidden-folded"></li>
+
+              <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">          
+                <span translate="aside.nav.your_stuff.YOUR_STUFF">Your Stuff</span>
+              </li>  
+              <li>
+                <a ui-sref="app.page.profile">
+                  <i class="icon-user icon text-success-lter"></i>
+                  <b class="badge bg-success pull-right">30%</b>
+                  <span translate="aside.nav.your_stuff.PROFILE">Profile</span>
+                </a>
+              </li>
+              <li>
+                <a ui-sref="app.docs">
+                  <i class="icon-question icon"></i>
+                  <span translate="aside.nav.your_stuff.DOCUMENTS">Documents</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <!-- nav -->
+
+          <!-- aside footer -->
+          <div class="wrapper m-t">
+            <div class="text-center-folded">
+              <span class="pull-right pull-none-folded">60%</span>
+              <span class="hidden-folded" translate="aside.MILESTONE">Milestone</span>
+            </div>
+            <div class="progress progress-xxs m-t-sm dk">
+              <div class="progress-bar progress-bar-info" style="width: 60%;">
+              </div>
+            </div>
+            <div class="text-center-folded">
+              <span class="pull-right pull-none-folded">35%</span>
+              <span class="hidden-folded" translate="aside.RELEASE">Release</span>
+            </div>
+            <div class="progress progress-xxs m-t-sm dk">
+              <div class="progress-bar progress-bar-primary" style="width: 35%;">
+              </div>
+            </div>
+          </div>
+          <!-- / aside footer -->
+
+       </div>
+      </div>
+    </div>
+    <!-- / menu ******************************************Menu************************************** -->
+
+    <!-- content -->
+    <div class="app-content" style="height:auto;background-color:white; font-size:16px">
+    <!-- head end here -->
+    
+    
+    <!---------------------Used For Model-------------------------------------->
+</xmp>    

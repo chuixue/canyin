@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<script type="text/javascript" src="JS/jquery.min.js"></script>
+<script type="text/javascript" src="JS/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="JS/bootstrap.min.js"></script>
+<link href="css/bootstrap.min.css" rel="stylesheet" />
+<link href="css/easyui.css" rel="stylesheet" />
+
+<link href="../css/font-awesome.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="Css/public.css" type="text/css" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+input[type="text"]{ width:250px; height:30px; margin:5px 5px 5px 0px; }
+input[type="file"]{ width:248px; height:25px; }
+.btnUpload{ width:55px;height:29px; margin-left:5px }
+.lbCheck{ width:100px; }
+.lbInfo{ color:#CCC; font-size:11px}
+#imgName{width:135px; height:26px; padding-top:0px; margin-top:0px; border:0px; margin-right:0px; padding-right:0px}
+#main{ padding:10px 10px 10px 20px; background-color:#ffffff}
+
+</style>
+
+<title>无标题文档</title>
+</head>
+<div id="dd"></div>
+<script language="javascript">
+
+function show2() {
+
+			dd.innerHTML ="123";
+            $('#dd').dialog({
+                title: '设备详细', modal: true, loadingMessage: '正在加载...',
+                buttons: [{
+                    text: '关闭', handler: function () { $('#dd').dialog('close'); }
+                }]
+            }).show();
+        }
+
+</script>
+<input type="button" id="btn" onclick="show2();" value="点击"/> 
+<input type="button" id="btn" onclick="show();" value="点击"/> 
+<div id="content" style="display:inline"></div> 
+
+
+
+<i class="fa fa-camera-retro fa-lg"></i> fa-lg
+
+
+
+
+
+<script language="javascript">
+
+            function show(){
+                //$("#content").html("123");
+				document.getElementById("content").innerHTML="123";
+				
+			try{
+                $("#content").show().dialog({        
+					width:470,    
+                    height:270,    
+                    modal:true ,
+                    collapsible:false,
+                    title:'测试',
+                    minimizable:false,
+                    maximizable:true,
+                    closable:true,
+                    draggable:false
+                });
+				}catch(e){
+				}
+            }
+        //});
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+<body>
+</body>
+</html>

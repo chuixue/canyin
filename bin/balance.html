@@ -58,7 +58,7 @@ th{ min-width:10px}
 <!---------------------------组件--------------------------->
 <div class="hide" id="divHide">
 	<div id="listAll">
-        <table id="tListAll">
+        <table id="tListAll" parentId="panel1">
             <div id="tb">
             <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon_remove_',plain:true" onClick="javascripts:;" ></a>
             <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onClick="javascripts:loadDataSingle();" ></a>
@@ -90,7 +90,6 @@ th{ min-width:10px}
 </script>
 
 <script>
-	var $j=$.noConflict();
 	var PUB_cfg=getConfig();
 	var PUB_user=getUser();	
 	var __ListData=[];
@@ -131,7 +130,11 @@ th{ min-width:10px}
 					var state=data[i].ostate;
 					dsk[id]={code:data[i].okey,state:state,onlykey:data[i].onlykey };
 					var color=(state==1)?cache_cfg.desk.selColor:cache_cfg.desk.usedColor;
-					$$("desk" + id).style.backgroundColor=color;										
+					try{
+						$$("desk" + id).style.backgroundColor=color;										
+					}catch(e){
+						
+					}
 				}
 				cache_ready=1;
 			}		
